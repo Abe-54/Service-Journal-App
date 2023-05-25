@@ -1,4 +1,5 @@
 import { Client } from "./Client";
+import { Order } from "./Order";
 
 export interface Invoice {
     invoice_id: number;
@@ -6,6 +7,5 @@ export interface Invoice {
     client_id: number;
     order_id: number;
     status: string;
-    Clients: Client;
-    service_dates: Date[];
+    Orders: Order;
 }

@@ -17,8 +17,8 @@ export const getSingleClient = async (userId: string, clientId: string) => {
   return res.data;
 };
 
-export const getInvoices = async (userId: string, clientId: string) => {
-  const res = await invoiceTrackerURL.get(`${userId}/clients/${clientId}`);
+export const getClientInvoices = async (userId: string, clientId: string) => {
+  const res = await invoiceTrackerURL.get(`${userId}/invoices/${clientId}`);
   console.log(res.data);
   return res.data;
 };
