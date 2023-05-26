@@ -7,5 +7,5 @@ export interface Invoice {
     client_id: number;
     order_id: number;
     status: string;
-    Orders: Order;
+    Orders: Order[];
 }

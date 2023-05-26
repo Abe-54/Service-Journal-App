@@ -4,7 +4,9 @@ import Colors from "../../../constants/Colors";
 const InvoiceListHeader = () => {
   return (
     <View style={styles.invoiceListContainerHeader}>
-      <Text style={styles.invoiceListContainerHeaderText}>SERVICE</Text>
+      <Text style={styles.invoiceListContainerHeaderText}>ID</Text>
+      <View style={styles.divider} />
+      <Text style={styles.invoiceListContainerHeaderText}>DATE</Text>
       <View style={styles.divider} />
       <Text style={styles.invoiceListContainerHeaderText}>STATUS</Text>
     </View>
@@ -21,7 +23,7 @@ const styles = StyleSheet.create({
   },
   invoiceListContainerHeaderText: {
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "600",
     flex: 1,
     padding: 10,

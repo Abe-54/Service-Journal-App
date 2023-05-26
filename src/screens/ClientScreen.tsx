@@ -1,22 +1,18 @@
 import { Stack, useSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Client } from "../../src/interfaces/Client";
 import { getClientInvoices, getSingleClient } from "../api";
 import InfoContainer from "../components/InfoContainer";
 import InvoicesView from "../components/Invoices View/InvoicesView";
 import Colors from "../constants/Colors";
 import { Invoice } from "../interfaces/Invoice";
-import { Order } from "../interfaces/Order";
-import { Service } from "../interfaces/Service";
 import normalizeName from "../util/NormalizeName";
 
 const ClientScreen = () => {
   const { client_id } = useSearchParams();
   const [client, setClient] = useState<Client>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [, setOrders] = useState<Order[]>([]);
-  const [, setServices] = useState<Service[]>([]);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -29,18 +25,6 @@ const ClientScreen = () => {
           client_id
         );
         setInvoices(fetchedInvoices);
-
-        // Extract and store the associated orders from the fetched invoices
-        const fetchedOrders: Order[] = fetchedInvoices.flatMap(
-          (invoice: Invoice) => invoice.Orders
-        );
-        setOrders(fetchedOrders);
-
-        // Extract and store the associated services from the fetched orders
-        const fetchedServices: Service[] = fetchedOrders.flatMap(
-          (order: Order) => order.Services
-        );
-        setServices(fetchedServices);
       }
     };
 

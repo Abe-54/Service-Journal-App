@@ -6,15 +6,19 @@ import { Client } from "../interfaces/Client";
 
 interface ClientButtonProps {
   client: Client;
+  backgroundColor: string;
+  onPress: () => void;
 }
 
-const ClientButton = ({ client }: ClientButtonProps) => {
-  const router = useRouter();
-
+const ClientButton = ({
+  client,
+  backgroundColor,
+  onPress,
+}: ClientButtonProps) => {
   return (
     <Pressable
       style={{
-        backgroundColor: Colors.royal_blue[300],
+        backgroundColor,
         display: "flex",
         flexDirection: "row",
         flexGrow: 1,
@@ -24,9 +28,7 @@ const ClientButton = ({ client }: ClientButtonProps) => {
         borderRadius: 8,
       }}
       android_disableSound={false}
-      onPress={() => {
-        router.push(`/clients/${client.client_id}`);
-      }}
+      onPress={onPress}
     >
       <Text
         style={{
