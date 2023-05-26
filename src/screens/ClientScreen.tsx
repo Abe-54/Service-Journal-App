@@ -4,7 +4,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Client } from "../../src/interfaces/Client";
 import { getClientInvoices, getSingleClient } from "../api";
 import InfoContainer from "../components/InfoContainer";
-import InvoicesList from "../components/Invoice List/InvoiceList";
+import InvoicesView from "../components/Invoices View/InvoicesView";
 import Colors from "../constants/Colors";
 import { Invoice } from "../interfaces/Invoice";
 import { Order } from "../interfaces/Order";
@@ -68,7 +68,7 @@ const ClientScreen = () => {
           />
           <View style={{ height: "100%" }}>
             <InfoContainer client={client} />
-            <InvoicesList invoices={invoices} />
+            <InvoicesView invoices={invoices} />
           </View>
         </View>
       )}
