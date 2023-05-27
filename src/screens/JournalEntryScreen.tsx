@@ -1,30 +1,30 @@
 import { Stack, useLocalSearchParams, useSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { getInvoice } from "../api";
+import { getJournalEntry } from "../api";
 import Colors from "../constants/Colors";
-import { Invoice } from "../interfaces/Invoice";
+import { JournalEntry } from "../interfaces/JournalEntry";
 
-const InvoiceScreen = () => {
-  const { invoice_id, client_id } = useLocalSearchParams<{
-    invoice_id: string;
+const JournalEntryScreen = () => {
+  const { journalEntry_id, client_id } = useLocalSearchParams<{
+    journalEntry_id: string;
     client_id?: string;
   }>();
-  const [invoice, setInvoice] = useState<Invoice>();
+  const [entry, setEntry] = useState<JournalEntry>();
 
   useEffect(() => {
-    const fetchInvoice = async () => {
-      if (invoice_id && client_id) {
-        const fetchedInvoice: Invoice = await getInvoice(
+    const fetchEntry = async () => {
+      if (journalEntry_id && client_id) {
+        const fetchedEntry: JournalEntry = await getJournalEntry(
           "1",
           client_id,
-          invoice_id
+          journalEntry_id
         );
-        setInvoice(fetchedInvoice);
+        setEntry(fetchedEntry);
       }
     };
-    fetchInvoice();
-  }, [invoice_id, client_id]);
+    fetchEntry();
+  }, [journalEntry_id, client_id]);
 
   return (
     <View
@@ -36,7 +36,7 @@ const InvoiceScreen = () => {
     >
       <Stack.Screen
         options={{
-          headerTitle: `INVOICE ID: ${invoice_id}`,
+          headerTitle: `JOURNAL ID: ${journalEntry_id}`,
           headerTitleAlign: "center",
           headerStyle: { backgroundColor: "#858cc7" },
         }}
@@ -46,4 +46,4 @@ const InvoiceScreen = () => {
   );
 };
 
-export default InvoiceScreen;
+export default JournalEntryScreen;

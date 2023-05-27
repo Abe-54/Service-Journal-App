@@ -2,44 +2,44 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Colors from "../../../constants/Colors";
-import { Invoice } from "../../../interfaces/Invoice";
+import { JournalEntry } from "../../../interfaces/JournalEntry";
 import CustomButton from "../../CustomButton";
 
-interface InvoiceListItemProps {
-  invoice: Invoice;
+interface EntryListItemProps {
+  entry: JournalEntry;
 }
 
-const InvoiceListItem = ({ invoice }: InvoiceListItemProps) => {
+const EntryListItem = ({ entry }: EntryListItemProps) => {
   const router = useRouter();
 
   const handleClick = () => {
     router.push(
-      `/clients/invoices/${invoice.invoice_id}?client_id=${invoice.client_id}`
+      `/clients/entries/${entry.journalEntry_id}?client_id=${entry.client_id}`
     );
   };
 
-  const firstDateWithinInvoice = new Date(invoice.Orders[0].service_date);
+  const firstDateWithinEntry = new Date(entry.serviceDates[0].service_date);
 
   return (
     <CustomButton onPress={handleClick} variant="primary">
-      <View style={styles.invoiceListItem}>
+      <View style={styles.entryListItem}>
         <Text
-          style={[styles.invoiceListItemText]}
+          style={[styles.entryListItemText]}
           adjustsFontSizeToFit={true}
           numberOfLines={1}
           ellipsizeMode="middle"
         >
-          {invoice.invoice_id}
+          {entry.journalEntry_id}
         </Text>
         <View style={styles.divider} />
         <Text
-          style={[styles.invoiceListItemText]}
+          style={[styles.entryListItemText]}
           adjustsFontSizeToFit={true}
           minimumFontScale={0.8}
           numberOfLines={1}
           ellipsizeMode="middle"
         >
-          {firstDateWithinInvoice.toLocaleDateString("en-US", {
+          {firstDateWithinEntry.toLocaleDateString("en-US", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
@@ -48,13 +48,13 @@ const InvoiceListItem = ({ invoice }: InvoiceListItemProps) => {
         </Text>
         <View style={styles.divider} />
         <Text
-          style={styles.invoiceListItemText}
+          style={styles.entryListItemText}
           adjustsFontSizeToFit={true}
           minimumFontScale={0.8}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {invoice.status}
+          {entry.status}
         </Text>
       </View>
     </CustomButton>
@@ -62,14 +62,14 @@ const InvoiceListItem = ({ invoice }: InvoiceListItemProps) => {
 };
 
 const styles = StyleSheet.create({
-  invoiceListItem: {
+  entryListItem: {
     // backgroundColor: Colors.royal_blue[400],
     justifyContent: "space-around",
     flexDirection: "row",
     flex: 1,
     borderBottomWidth: 2,
   },
-  invoiceListItemText: {
+  entryListItemText: {
     textAlign: "center",
     fontSize: 18,
     fontWeight: "500",
@@ -85,4 +85,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InvoiceListItem;
+export default EntryListItem;

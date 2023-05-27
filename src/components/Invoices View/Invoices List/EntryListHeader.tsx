@@ -1,27 +1,27 @@
 import { StyleSheet, Text, View } from "react-native";
 import Colors from "../../../constants/Colors";
 
-const InvoiceListHeader = () => {
+const EntryListHeader = () => {
   return (
-    <View style={styles.invoiceListContainerHeader}>
-      <Text style={styles.invoiceListContainerHeaderText}>ID</Text>
+    <View style={styles.entryListContainerHeader}>
+      <Text style={styles.entryListContainerHeaderText}>ID</Text>
       <View style={styles.divider} />
-      <Text style={styles.invoiceListContainerHeaderText}>DATE</Text>
+      <Text style={styles.entryListContainerHeaderText}>DATE</Text>
       <View style={styles.divider} />
-      <Text style={styles.invoiceListContainerHeaderText}>STATUS</Text>
+      <Text style={styles.entryListContainerHeaderText}>STATUS</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  invoiceListContainerHeader: {
+  entryListContainerHeader: {
     backgroundColor: Colors.royal_blue[200],
     justifyContent: "space-evenly",
     flexDirection: "row",
     flex: 1,
     borderBottomWidth: 2,
   },
-  invoiceListContainerHeaderText: {
+  entryListContainerHeaderText: {
     textAlign: "center",
     fontSize: 14,
     fontWeight: "600",
@@ -37,4 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InvoiceListHeader;
+export default EntryListHeader;

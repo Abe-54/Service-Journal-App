@@ -17,14 +17,14 @@ export const getSingleClient = async (userId: string, clientId: string) => {
   return res.data;
 };
 
-export const getClientInvoices = async (userId: string, clientId: string) => {
-  const res = await invoiceTrackerURL.get(`${userId}/invoices/client=${clientId}`);
+export const getClientJournal = async (userId: string, clientId: string) => {
+  const res = await invoiceTrackerURL.get(`${userId}/journal/client=${clientId}`);
   console.log(res.data);
   return res.data;
 };
 
-export const getInvoice = async (userId: string, clientId: string, invoiceId: string) => {
-  const res = await invoiceTrackerURL.get(`${userId}/invoices/client=${clientId}/invoice=${invoiceId}`);
+export const getJournalEntry = async (userId: string, clientId: string, journalEntryId: string) => {
+  const res = await invoiceTrackerURL.get(`${userId}/journal/client=${clientId}/journal_entry=${journalEntryId}`);
   console.log(res.data);
   return res.data;
 };

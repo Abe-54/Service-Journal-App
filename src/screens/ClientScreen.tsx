@@ -1,18 +1,18 @@
-import { Stack, useSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Client } from "../../src/interfaces/Client";
-import { getClientInvoices, getSingleClient } from "../api";
+import { getClientJournal, getSingleClient } from "../api";
 import InfoContainer from "../components/InfoContainer";
-import InvoicesView from "../components/Invoices View/InvoicesView";
+import JournalView from "../components/Invoices View/JournalView";
 import Colors from "../constants/Colors";
-import { Invoice } from "../interfaces/Invoice";
+import { JournalEntry } from "../interfaces/JournalEntry";
 import normalizeName from "../util/NormalizeName";
 
 const ClientScreen = () => {
-  const { client_id } = useSearchParams();
+  const { client_id } = useLocalSearchParams();
   const [client, setClient] = useState<Client>();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [journal, setJournal] = useState<JournalEntry[]>([]);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -20,11 +20,11 @@ const ClientScreen = () => {
         const fetchedClient: Client = await getSingleClient("1", client_id);
         setClient(fetchedClient);
 
-        const fetchedInvoices: Invoice[] = await getClientInvoices(
+        const fetchedJournal: JournalEntry[] = await getClientJournal(
           "1",
           client_id
         );
-        setInvoices(fetchedInvoices);
+        setJournal(fetchedJournal);
       }
     };
 
@@ -52,7 +52,7 @@ const ClientScreen = () => {
           />
           <View style={{ height: "100%" }}>
             <InfoContainer client={client} />
-            <InvoicesView invoices={invoices} />
+            <JournalView journalEntries={journal} />
           </View>
         </View>
       )}

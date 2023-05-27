@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Colors from "../../constants/Colors";
-import { Invoice } from "../../interfaces/Invoice";
-import InvoiceList from "./Invoices List/InvoiceList";
+import { JournalEntry } from "../../interfaces/JournalEntry";
+import JournalEntryList from "./Invoices List/JournalEntryList";
 
-interface InvoicesViewProps {
-  invoices: Invoice[];
+interface JournalViewProps {
+  journalEntries: JournalEntry[];
 }
 
-const InvoicesView = ({ invoices }: InvoicesViewProps) => {
+const JournalView = ({ journalEntries }: JournalViewProps) => {
   return (
     <View
       style={{
@@ -18,29 +18,29 @@ const InvoicesView = ({ invoices }: InvoicesViewProps) => {
       }}
     >
       <View>
-        <Text style={styles.invoiceListTitle}>Invoices</Text>
+        <Text style={styles.journalListTitle}>Journal Entries</Text>
       </View>
-      <View style={styles.invoiceListContainer}>
-        <InvoiceList invoices={invoices} />
+      <View style={styles.journalListContainer}>
+        <JournalEntryList entries={journalEntries} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  invoiceListTitle: {
+  journalListTitle: {
     textAlign: "center",
     fontSize: 24,
     color: "white",
     fontWeight: "600",
     marginTop: 5,
   },
-  invoiceListEmptyItem: {
+  journalListEmptyItem: {
     backgroundColor: Colors.royal_blue[400],
     borderBottomWidth: 1,
     textAlign: "center",
   },
-  invoiceListContainer: {
+  journalListContainer: {
     backgroundColor: Colors.royal_blue[400],
     marginHorizontal: 20,
     borderRadius: 10,
@@ -56,4 +56,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InvoicesView;
+export default JournalView;
