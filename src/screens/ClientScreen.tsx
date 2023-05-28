@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 import { Client } from "../../src/interfaces/Client";
 import { getClientJournal, getSingleClient } from "../api";
 import InfoContainer from "../components/InfoContainer";
-import JournalView from "../components/Invoices View/JournalView";
+import JournalView from "../components/Journal View/JournalView";
 import Colors from "../constants/Colors";
 import { JournalEntry } from "../interfaces/JournalEntry";
 import normalizeName from "../util/NormalizeName";
@@ -31,6 +31,15 @@ const ClientScreen = () => {
     fetchClient();
   }, [client_id]);
 
+  const clientData = [
+    { title: "City", value: client?.city ?? "No City" },
+    { title: "Street", value: client?.street ?? "No Street" },
+    {
+      title: "House",
+      value: client?.house_number.toString() ?? "No House Number",
+    },
+  ];
+
   return (
     <View
       style={{
@@ -51,7 +60,11 @@ const ClientScreen = () => {
             }}
           />
           <View style={{ height: "100%" }}>
-            <InfoContainer client={client} />
+            <InfoContainer
+              data={clientData}
+              title={"Client Information"}
+              onUpdate={() => {}}
+            />
             <JournalView journalEntries={journal} />
           </View>
         </View>

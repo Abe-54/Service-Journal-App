@@ -27,9 +27,9 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="newInvoiceTab"
+        name="newEntryTab"
         options={{
-          title: "New Invoice",
+          title: "New Entry",
           tabBarIcon: ({ focused, color }) => (
             <MaterialCommunityIcons name="plus" size={24} color={color} />
           ),

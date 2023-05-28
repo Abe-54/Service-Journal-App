@@ -63,7 +63,6 @@ const EntryListItem = ({ entry }: EntryListItemProps) => {
 
 const styles = StyleSheet.create({
   entryListItem: {
-    // backgroundColor: Colors.royal_blue[400],
     justifyContent: "space-around",
     flexDirection: "row",
     flex: 1,

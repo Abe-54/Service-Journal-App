@@ -8,4 +8,5 @@ export interface JournalEntry {
     serviceDates: ServiceDates[];
     price: string;
     description: string;
+    service: string;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Colors from "../../constants/Colors";
 import { JournalEntry } from "../../interfaces/JournalEntry";
-import JournalEntryList from "./Invoices List/JournalEntryList";
+import JournalEntryList from "./Journal Entry List/JournalEntryList";
 
 interface JournalViewProps {
   journalEntries: JournalEntry[];
