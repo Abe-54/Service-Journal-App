@@ -29,3 +29,21 @@ export const getJournalEntry = async (userId: string, clientId: string, journalE
   return res.data;
 };
 
+export const updateJournalEntry = async (journalEntryId: string, data: any) => {
+  const res = await invoiceTrackerURL.patch(`/update/journal_entry=${journalEntryId}`, data);
+  console.log(res.data);
+  return res.data;
+};
+
+export const getServiceById = async (userId: string, service_id: number) => {
+  const res = await invoiceTrackerURL.get(`${userId}/services/service_id=${service_id}`);
+  console.log(res.data); 
+  return res.data;
+};
+
+export const getServiceByName = async (userId: string, serviceName: string) => {
+  const res = await invoiceTrackerURL.get(`${userId}/services/service_name=${serviceName}`);
+  console.log(res.data); 
+  return res.data;
+};
+

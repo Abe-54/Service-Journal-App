@@ -4,16 +4,33 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
 import Colors from "../constants/Colors";
+import DropdownComponent from "./Pure Components/DropdownComponent";
+import TextInputComponent from "./Pure Components/TextInputComponent";
 
 interface InfoContainerProps {
-  data: Array<{ title: string; value: string }>;
+  data: Array<{
+    title: string;
+    value: string;
+    isNumeric?: boolean;
+    isCurrency?: boolean;
+    type?: "text" | "dropdown";
+    options?: string[];
+  }>;
   title: string;
   editable?: boolean;
-  onUpdate: (updatedData: Array<{ title: string; value: string }>) => void;
+  onUpdate: (
+    updatedData: Array<{
+      title: string;
+      value: string;
+      isNumeric?: boolean;
+      isCurrency?: boolean;
+    }>
+  ) => void;
 }
 
 const InfoContainer = ({
@@ -22,34 +39,38 @@ const InfoContainer = ({
   editable = false,
   onUpdate,
 }: InfoContainerProps) => {
-  const [updatedData, setUpdatedData] = useState(data);
-  const [editableIndex, setEditableIndex] = useState<number>(-1);
+  const [textInputValue, setTextInputValue] = useState<string>("");
 
-  const handleValueChange = (index: number, value: string) => {
-    const newData = [...updatedData];
-    newData[index].value = value;
-    setUpdatedData(newData);
-  };
+  const renderInputComponent = (item: {
+    title: string;
+    value: string;
+    isNumeric?: boolean;
+    isCurrency?: boolean;
+    type?: "text" | "dropdown";
+    options?: string[];
+  }) => {
+    const type = item.type || "text";
 
-  const handleToggleEdit = (index: number) => {
-    if (editableIndex === index) {
-      setEditableIndex(-1);
-      if (editableIndex !== -1) {
-        handleConfirmChanges();
-      }
-    } else {
-      setEditableIndex(index);
+    switch (type) {
+      case "dropdown":
+        return <DropdownComponent />;
+      case "text":
+      default:
+        return (
+          <TextInputComponent
+            value={textInputValue}
+            onValueChange={(text) => {
+              setTextInputValue(text);
+            }}
+            placeholder={item.value}
+            numberOfLines={1}
+            onChangeText={(text: React.SetStateAction<string>) =>
+              setTextInputValue(text)
+            }
+            keyboardType={item.isNumeric ? "numeric" : "default"}
+          />
+        );
     }
-  };
-
-  const handleConfirmChanges = () => {
-    onUpdate(updatedData);
-  };
-
-  const getTextInputWidth = (placeholder: string) => {
-    const minWidth = 100;
-    const width = placeholder.length * 10 + 30;
-    return Math.max(width, minWidth);
   };
 
   return (
@@ -81,45 +102,19 @@ const InfoContainer = ({
                 },
               ]}
             >
-              {editable && editableIndex === index ? (
-                <TextInput
-                  style={[
-                    styles.infoText,
-                    styles.editableTextInput,
-                    { width: getTextInputWidth(item.value) },
-                  ]}
-                  placeholder={item.value}
-                  onChangeText={(value) => handleValueChange(index, value)}
-                  autoFocus={true}
-                />
+              {editable ? (
+                renderInputComponent(item)
               ) : (
-                <View>
-                  <Text
-                    style={styles.infoText}
-                    adjustsFontSizeToFit={true}
-                    minimumFontScale={0.5}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {item.value}
-                  </Text>
-                </View>
-              )}
-              {editable && (
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => handleToggleEdit(index)}
+                <Text
+                  style={styles.infoText}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  selectable={true}
                 >
-                  <MaterialCommunityIcons
-                    name={
-                      editableIndex === index
-                        ? "checkbox-outline"
-                        : "square-edit-outline"
-                    }
-                    size={24}
-                    color={editableIndex === index ? "green" : "tomato"}
-                  />
-                </TouchableOpacity>
+                  {item.isNumeric && (item.isCurrency || false)
+                    ? `$${parseFloat(item.value).toFixed(2)}`
+                    : item.value}
+                </Text>
               )}
             </View>
           </View>
@@ -135,7 +130,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
     fontWeight: "600",
-    marginTop: 20,
+    marginTop: 10,
   },
   infoContainer: {
     marginHorizontal: 20,
@@ -168,13 +163,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 3,
     borderColor: Colors.royal_blue[500],
   },
-  infoText: {
-    color: "black",
-    fontSize: 20,
-    fontWeight: "500",
-    marginHorizontal: 15,
-    paddingVertical: 15,
-  },
   confirmButton: {
     backgroundColor: Colors.dark_green[100], // Customize the button styles
     alignItems: "center",
@@ -189,14 +177,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   editButton: {
-    width: "min-content",
+    // width: "100%",
   },
-  editableTextInput: {
-    backgroundColor: "white",
-    borderColor: "gray",
-    borderWidth: 2,
-    borderRadius: 5,
-    padding: 10,
+  infoText: {
+    color: "black",
+    fontSize: 20,
+    fontWeight: "500",
+    marginHorizontal: 15,
+    paddingVertical: 15,
   },
 });
 

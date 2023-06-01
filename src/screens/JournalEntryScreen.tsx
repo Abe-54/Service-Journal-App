@@ -1,12 +1,43 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Calendar } from "react-native-calendars";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Calendar, CalendarProvider } from "react-native-calendars";
 import { Direction, MarkedDates } from "react-native-calendars/src/types";
-import { getJournalEntry } from "../api";
+import {
+  getJournalEntry,
+  getServiceById,
+  getServiceByName,
+  updateJournalEntry,
+} from "../api";
 import InfoContainer from "../components/InfoContainer";
 import Colors from "../constants/Colors";
 import { JournalEntry } from "../interfaces/JournalEntry";
+import { Service } from "../interfaces/Service";
+
+interface JournalEntryItem {
+  title: string;
+  value: string;
+  isNumeric?: boolean;
+  isCurrency?: boolean;
+  type?: "text" | "dropdown";
+  options?: string[];
+}
+
+const initialJournalEntry: JournalEntryItem[] = [
+  {
+    title: "Service",
+    value: "No Service",
+  },
+  {
+    title: "Price",
+    value: "No Price",
+  },
+  {
+    title: "Status",
+    value: "No Status",
+  },
+];
 
 const JournalEntryScreen = () => {
   const { journalEntry_id, client_id } = useLocalSearchParams<{
@@ -14,6 +45,9 @@ const JournalEntryScreen = () => {
     client_id?: string;
   }>();
   const [entry, setEntry] = useState<JournalEntry>();
+  const [editable, setEditable] = useState<boolean>(false);
+  const [serviceId, setServiceId] = useState<number>();
+  const [journalEntry, setJournalData] = useState([...initialJournalEntry]);
 
   useEffect(() => {
     const fetchEntry = async () => {
@@ -26,29 +60,75 @@ const JournalEntryScreen = () => {
         setEntry(fetchedEntry);
       }
     };
+
     fetchEntry();
   }, [journalEntry_id, client_id]);
 
-  const journalData = [
-    { title: "Service", value: entry?.service ?? "No Service" },
-    {
-      title: "Price",
-      value: "$" + parseFloat(entry?.price || "0").toFixed(2) ?? "No Price",
-    },
-    { title: "Status", value: entry?.status ?? "No Status" },
-  ];
+  useEffect(() => {
+    if (entry) {
+      setJournalData([
+        {
+          title: "Service",
+          value: entry.Service.service_name,
+          type: "dropdown",
+          options: ["Service 1", "Service 2", "Service 3"],
+        },
+        {
+          title: "Price",
+          value: entry.price || "0",
+          isNumeric: true,
+          isCurrency: true,
+        },
+        {
+          title: "Status",
+          value: entry.status,
+          type: "dropdown",
+          options: ["Service 1", "Service 2", "Service 3"],
+        },
+      ]);
+      setServiceId(entry.Service.service_id);
+    }
+  }, [entry]);
 
-  const serviceDates = entry?.serviceDates.reduce((dates, date) => {
-    const formattedDate = new Date(date.service_date);
-    dates[formattedDate.toISOString().slice(0, 10)] = {
-      color: Colors.royal_blue[500],
-      textColor: "white",
-      startingDay: true,
-      endingDay: true,
-    };
-    console.log(dates);
-    return dates;
-  }, {} as MarkedDates);
+  const serviceDates = entry?.serviceDates.reduce(
+    (markedDates, serviceDate) => {
+      const formattedDate = new Date(serviceDate.service_date)
+        .toISOString()
+        .slice(0, 10);
+      markedDates[formattedDate] = {
+        color: Colors.royal_blue[500],
+        textColor: "white",
+        startingDay: true,
+        endingDay: true,
+      };
+      console.log(markedDates);
+      return markedDates;
+    },
+    {} as MarkedDates
+  );
+
+  const handleUpdateEntry = async (
+    tempData: Array<{ title: string; value: string; isNumeric?: boolean }>
+  ) => {
+    console.log(tempData);
+    setJournalData(tempData);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const updateEntry = await updateJournalEntry(journalEntry_id ?? "", {
+        // service_id: serviceId,
+        price: journalEntry[1].value,
+        status: journalEntry[2].value,
+      });
+      setEditable(false);
+      console.log(updateEntry);
+      updateEntry();
+    } catch (err) {
+      console.log(err);
+      setEditable(false);
+    }
+  };
 
   return (
     <View
@@ -63,46 +143,79 @@ const JournalEntryScreen = () => {
           headerTitle: `JOURNAL ID: ${journalEntry_id}`,
           headerTitleAlign: "center",
           headerStyle: { backgroundColor: "#858cc7" },
+          headerRight() {
+            return (
+              !editable && (
+                <MaterialCommunityIcons
+                  name={"square-edit-outline"}
+                  size={24}
+                  onPress={() => setEditable(!editable)}
+                />
+              )
+            );
+          },
         }}
       />
       <View style={styles.entryView}>
         <InfoContainer
-          data={journalData}
+          data={journalEntry}
           title="Entry Data"
-          editable={true}
-          onUpdate={(data) => {
-            console.log(data);
-          }}
+          editable={editable}
+          onUpdate={handleUpdateEntry}
         />
-        <Calendar
-          style={{
-            borderRadius: 5,
-            margin: 12,
-            marginHorizontal: 20,
-          }}
-          theme={{
-            calendarBackground: Colors.royal_blue[300],
-            textDayFontWeight: "600",
-            textMonthFontWeight: "600",
-            textDayHeaderFontWeight: "600",
-            dayTextColor: "black",
-            textDisabledColor: "gray",
-            monthTextColor: "black",
-            textSectionTitleColor: "white",
-            arrowColor: "white",
-          }}
-          disableAllTouchEventsForDisabledDays={true}
-          markingType="period"
-          markedDates={serviceDates}
-          minDate={serviceDates ? Object.keys(serviceDates)[0] : undefined}
-          maxDate={
-            serviceDates
-              ? Object.keys(serviceDates)[Object.keys(serviceDates).length - 1]
-              : undefined
-          }
-          hideArrows={true}
-          hideExtraDays={true}
-        />
+
+        {serviceDates ? (
+          <Calendar
+            style={{
+              borderRadius: 5,
+              marginVertical: 5,
+              marginHorizontal: 20,
+            }}
+            theme={{
+              calendarBackground: Colors.royal_blue[300],
+              textDayFontWeight: "600",
+              textMonthFontWeight: "600",
+              textDayHeaderFontWeight: "600",
+              dayTextColor: "black",
+              textDisabledColor: "gray",
+              monthTextColor: "black",
+              textSectionTitleColor: "white",
+              arrowColor: "white",
+            }}
+            disableAllTouchEventsForDisabledDays={true}
+            markingType="period"
+            markedDates={serviceDates}
+            minDate={Object.keys(serviceDates)[0]}
+            maxDate={
+              Object.keys(serviceDates)[Object.keys(serviceDates).length - 1]
+            }
+            initialDate={Object.keys(serviceDates)[0]}
+            hideArrows={true}
+            hideExtraDays={true}
+          />
+        ) : (
+          <View>
+            <Text>Loading...</Text>
+          </View>
+        )}
+
+        {editable && (
+          <View style={{ display: "flex", flexDirection: "row" }}>
+            <TouchableOpacity
+              style={[styles.button, styles.submitButton]}
+              onPress={handleSubmit}
+            >
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={() => setEditable(false)}
+            >
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -129,6 +242,24 @@ const styles = StyleSheet.create({
     margin: 12,
     elevation: 5,
     borderWidth: 4,
+  },
+  button: {
+    padding: 10,
+    marginHorizontal: 20,
+    marginTop: 5,
+    borderRadius: 5,
+    flexGrow: 1,
+  },
+  buttonText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16,
+  },
+  submitButton: {
+    backgroundColor: Colors.royal_blue[600],
+  },
+  cancelButton: {
+    backgroundColor: Colors.error,
   },
 });
 
