@@ -8,9 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 import Colors from "../constants/Colors";
-import DropdownComponent from "./Pure Components/DropdownComponent";
-import TextInputComponent from "./Pure Components/TextInputComponent";
+import {
+  default as DropdownComponent,
+  default as DropdownPickerComponent,
+} from "./Input Components/DropdownComponent";
+import TextInputComponent from "./Input Components/TextInputComponent";
 
 interface InfoContainerProps {
   data: Array<{
@@ -40,20 +44,60 @@ const InfoContainer = ({
   onUpdate,
 }: InfoContainerProps) => {
   const [textInputValue, setTextInputValue] = useState<string>("");
+  const [openDropdowns, setOpenDropdowns] = useState<number[]>([]);
 
-  const renderInputComponent = (item: {
-    title: string;
-    value: string;
-    isNumeric?: boolean;
-    isCurrency?: boolean;
-    type?: "text" | "dropdown";
-    options?: string[];
-  }) => {
+  const renderInputComponent = (
+    item: {
+      title: string;
+      value: string;
+      isNumeric?: boolean;
+      isCurrency?: boolean;
+      type?: "text" | "dropdown";
+      options?: string[];
+    },
+    itemIndex: number
+  ) => {
     const type = item.type || "text";
+    // console.log("ITEM: " + item.value);
 
     switch (type) {
       case "dropdown":
-        return <DropdownComponent />;
+        const dropdownOptions = item.options?.map((option) => ({
+          label: option,
+          value: option,
+        }));
+
+        return (
+          <DropdownPickerComponent
+            value={item.value}
+            items={dropdownOptions || []}
+            open={openDropdowns.includes(itemIndex)}
+            setOpen={() => {
+              if (openDropdowns.includes(itemIndex)) {
+                setOpenDropdowns(
+                  openDropdowns.filter((index) => index !== itemIndex)
+                );
+              } else {
+                setOpenDropdowns([itemIndex]); // Open the dropdown and close others
+              }
+            }}
+            setValue={(newValue) => {
+              const updatedData = data.map((item, index) => {
+                if (index === itemIndex) {
+                  return {
+                    ...item,
+                    value:
+                      typeof newValue === "function"
+                        ? newValue(item.value)
+                        : newValue,
+                  };
+                }
+                return item;
+              });
+              onUpdate(updatedData);
+            }}
+          />
+        );
       case "text":
       default:
         return (
@@ -74,7 +118,7 @@ const InfoContainer = ({
   };
 
   return (
-    <View>
+    <View style={{ zIndex: 1 }}>
       <Text style={styles.infoContainerTitle}>{title}</Text>
       <View style={styles.infoContainer}>
         {data.map((item, index) => (
@@ -87,23 +131,18 @@ const InfoContainer = ({
                   index % 2 === 0
                     ? Colors.royal_blue[200]
                     : Colors.royal_blue[100],
+                zIndex: data.length - index,
+                borderTopLeftRadius: index === 0 ? 10 : 0,
+                borderTopRightRadius: index === 0 ? 10 : 0,
+                borderBottomLeftRadius: index === data.length - 1 ? 10 : 0,
+                borderBottomRightRadius: index === data.length - 1 ? 10 : 0,
               },
             ]}
           >
             <Text style={styles.infoTitle}>{item.title}:</Text>
-            <View
-              style={[
-                styles.infoContainerCol,
-                {
-                  backgroundColor:
-                    index % 2 === 0
-                      ? Colors.royal_blue[200]
-                      : Colors.royal_blue[100],
-                },
-              ]}
-            >
+            <View style={[styles.infoContainerCol]}>
               {editable ? (
-                renderInputComponent(item)
+                renderInputComponent(item, index)
               ) : (
                 <Text
                   style={styles.infoText}
@@ -135,8 +174,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     marginHorizontal: 20,
     marginVertical: 10,
-    overflow: "hidden",
-    borderRadius: 10,
+    // overflow: "hidden",
   },
   infoContainerRow: {
     display: "flex",
@@ -175,9 +213,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  editButton: {
-    // width: "100%",
   },
   infoText: {
     color: "black",

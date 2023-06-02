@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Calendar, CalendarProvider } from "react-native-calendars";
 import { Direction, MarkedDates } from "react-native-calendars/src/types";
 import {
+  getAllServices,
   getJournalEntry,
   getServiceById,
   getServiceByName,
@@ -46,8 +47,8 @@ const JournalEntryScreen = () => {
   }>();
   const [entry, setEntry] = useState<JournalEntry>();
   const [editable, setEditable] = useState<boolean>(false);
-  const [serviceId, setServiceId] = useState<number>();
   const [journalEntry, setJournalData] = useState([...initialJournalEntry]);
+  const [services, setServices] = useState<Service[]>([]);
 
   useEffect(() => {
     const fetchEntry = async () => {
@@ -65,13 +66,21 @@ const JournalEntryScreen = () => {
   }, [journalEntry_id, client_id]);
 
   useEffect(() => {
+    const fetchServices = async () => {
+      const fetchedServices: Service[] = await getAllServices("1");
+      setServices(fetchedServices);
+    };
+    fetchServices();
+  }, ["1"]);
+
+  useEffect(() => {
     if (entry) {
       setJournalData([
         {
           title: "Service",
           value: entry.Service.service_name,
           type: "dropdown",
-          options: ["Service 1", "Service 2", "Service 3"],
+          options: services.map((service) => service.service_name) || [],
         },
         {
           title: "Price",
@@ -83,10 +92,9 @@ const JournalEntryScreen = () => {
           title: "Status",
           value: entry.status,
           type: "dropdown",
-          options: ["Service 1", "Service 2", "Service 3"],
+          options: ["Not Started", "In Progress", "Completed"],
         },
       ]);
-      setServiceId(entry.Service.service_id);
     }
   }, [entry]);
 
@@ -116,14 +124,16 @@ const JournalEntryScreen = () => {
 
   const handleSubmit = async () => {
     try {
+      const service_id = services.find(
+        (item) => item.service_name === journalEntry[0].value
+      )?.service_id;
+
       const updateEntry = await updateJournalEntry(journalEntry_id ?? "", {
-        // service_id: serviceId,
+        service_id: service_id,
         price: journalEntry[1].value,
         status: journalEntry[2].value,
       });
       setEditable(false);
-      console.log(updateEntry);
-      updateEntry();
     } catch (err) {
       console.log(err);
       setEditable(false);
@@ -240,8 +250,9 @@ const styles = StyleSheet.create({
   calendarStyle: {
     borderRadius: 5,
     margin: 12,
-    elevation: 5,
+    elevation: -9999,
     borderWidth: 4,
+    zIndex: -9999,
   },
   button: {
     padding: 10,

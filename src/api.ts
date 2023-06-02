@@ -31,9 +31,15 @@ export const getJournalEntry = async (userId: string, clientId: string, journalE
 
 export const updateJournalEntry = async (journalEntryId: string, data: any) => {
   const res = await invoiceTrackerURL.patch(`/update/journal_entry=${journalEntryId}`, data);
-  console.log(res.data);
+  console.log("New Journal Data: ", res.data);
   return res.data;
 };
+
+export const getAllServices = async (userId: string) => {
+  const res = await invoiceTrackerURL.get(`${userId}/services/`);
+  console.log(res.data);
+  return res.data;
+}
 
 export const getServiceById = async (userId: string, service_id: number) => {
   const res = await invoiceTrackerURL.get(`${userId}/services/service_id=${service_id}`);

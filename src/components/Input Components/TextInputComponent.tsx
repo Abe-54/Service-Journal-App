@@ -7,21 +7,23 @@ import {
   View,
 } from "react-native";
 
+interface TextInputComponentProps extends TextInputProps {
+  value: string;
+  onValueChange: (value: string) => void;
+  [key: string]: any;
+}
+
 const TextInputComponent = ({
   value,
   onValueChange,
   ...props
-}: {
-  value: string;
-  onValueChange: (value: string) => void;
-  [key: string]: any; // Allow additional props
-}) => {
+}: TextInputComponentProps) => {
   return (
     <TextInput
-      style={[styles.infoText, styles.editableTextInput, { width: "100%" }]}
+      style={[styles.infoText, styles.editableTextInput]}
       value={value}
       onChangeText={onValueChange}
-      {...props} // Spread additional props
+      {...props}
     />
   );
 };
@@ -42,5 +44,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 5,
     padding: 10,
+    width: "100%",
   },
 });
