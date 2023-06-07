@@ -3,29 +3,26 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 import Colors from "../constants/Colors";
 import { Client } from "../interfaces/Client";
+import normalizeName from "../util/NormalizeName";
+import CustomButton from "./CustomButton";
 
 interface ClientButtonProps {
   client: Client;
-  backgroundColor: string;
   onPress: () => void;
 }
 
-const ClientButton = ({
-  client,
-  backgroundColor,
-  onPress,
-}: ClientButtonProps) => {
+const ClientButton = ({ client, onPress }: ClientButtonProps) => {
   return (
-    <Pressable
+    <CustomButton
+      variant="light_blue"
       style={{
-        backgroundColor,
         display: "flex",
         flexDirection: "row",
         flexGrow: 1,
         alignItems: "center",
         padding: 20,
         margin: 16,
-        borderRadius: 8,
+        borderRadius: 5,
       }}
       android_disableSound={false}
       onPress={onPress}
@@ -38,9 +35,9 @@ const ClientButton = ({
           fontWeight: "700",
         }}
       >
-        {client.client_name}
+        {normalizeName(client)}
       </Text>
-    </Pressable>
+    </CustomButton>
   );
 };
 

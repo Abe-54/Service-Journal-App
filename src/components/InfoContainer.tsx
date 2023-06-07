@@ -58,7 +58,6 @@ const InfoContainer = ({
     itemIndex: number
   ) => {
     const type = item.type || "text";
-    // console.log("ITEM: " + item.value);
 
     switch (type) {
       case "dropdown":

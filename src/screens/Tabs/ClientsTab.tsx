@@ -1,17 +1,19 @@
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { Provider, createStore, useAtom } from "jotai";
 import React from "react";
 import { FlatList } from "react-native";
-import { clientsListAtom } from "../../atoms";
+import { getClients } from "../../api";
 import ClientButton from "../../components/ClientButton";
 import Colors from "../../constants/Colors";
-
-const clientsAtom = clientsListAtom();
+import { Client } from "../../interfaces/Client";
 
 const clientsTab = () => {
-  const [clients] = useAtom(clientsAtom);
-
   const router = useRouter();
+
+  const { isLoading, error, data, refetch } = useQuery<Client[], Error>(
+    ["client", { client_id: "1" }],
+    async () => await getClients("1")
+  );
 
   const handleClientPress = (clientId: string) => {
     router.push(`/clients/${clientId}`);
@@ -19,12 +21,11 @@ const clientsTab = () => {
 
   return (
     <FlatList
-      data={clients}
+      data={data}
       renderItem={({ item }) => (
         <ClientButton
           client={item}
-          backgroundColor={Colors.royal_blue[300]}
-          onPress={() => handleClientPress(item.client_id)}
+          onPress={() => handleClientPress(item.client_id.toString())}
         />
       )}
       style={{ backgroundColor: Colors.dark_green[500] }}

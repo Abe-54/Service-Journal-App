@@ -5,24 +5,28 @@ import {
   TextInput,
   TextInputProps,
   View,
+  ViewStyle,
+  StyleProp,
 } from "react-native";
 
 interface TextInputComponentProps extends TextInputProps {
-  value: string;
-  onValueChange: (value: string) => void;
-  [key: string]: any;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 const TextInputComponent = ({
   value,
   onValueChange,
+  style,
   ...props
 }: TextInputComponentProps) => {
   return (
     <TextInput
-      style={[styles.infoText, styles.editableTextInput]}
+      style={[styles.editableTextInput, style]}
       value={value}
       onChangeText={onValueChange}
+      placeholderTextColor={"gray"}
       {...props}
     />
   );
@@ -31,14 +35,10 @@ const TextInputComponent = ({
 export default TextInputComponent;
 
 const styles = StyleSheet.create({
-  infoText: {
-    color: "black",
-    fontSize: 20,
-    fontWeight: "500",
-    marginHorizontal: 15,
-    paddingVertical: 15,
-  },
   editableTextInput: {
+    color: "black",
+    fontSize: 16,
+    fontWeight: "500",
     backgroundColor: "white",
     borderColor: "gray",
     borderWidth: 2,

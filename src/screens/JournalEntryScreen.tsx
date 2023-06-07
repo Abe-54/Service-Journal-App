@@ -1,16 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Calendar, CalendarProvider } from "react-native-calendars";
-import { Direction, MarkedDates } from "react-native-calendars/src/types";
-import {
-  getAllServices,
-  getJournalEntry,
-  getServiceById,
-  getServiceByName,
-  updateJournalEntry,
-} from "../api";
+import { MarkedDates } from "react-native-calendars/src/types";
+import { getAllServices, getJournalEntry, updateJournalEntry } from "../api";
 import InfoContainer from "../components/InfoContainer";
 import Colors from "../constants/Colors";
 import { JournalEntry } from "../interfaces/JournalEntry";
@@ -41,64 +36,74 @@ const initialJournalEntry: JournalEntryItem[] = [
 ];
 
 const JournalEntryScreen = () => {
+  const queryClient = useQueryClient();
   const { journalEntry_id, client_id } = useLocalSearchParams<{
     journalEntry_id: string;
     client_id?: string;
   }>();
-  const [entry, setEntry] = useState<JournalEntry>();
   const [editable, setEditable] = useState<boolean>(false);
   const [journalEntry, setJournalData] = useState([...initialJournalEntry]);
-  const [services, setServices] = useState<Service[]>([]);
+  const [tempJournalData, seTempJournalData] = useState<JournalEntryItem[]>([
+    ...initialJournalEntry,
+  ]);
+
+  const {
+    isLoading: isEntryLoading,
+    error: entryError,
+    data: entryData,
+    refetch: refetchEntry,
+  } = useQuery<JournalEntry, Error>(
+    [
+      "journalEntry",
+      {
+        client_id: String(client_id),
+        journalEntry_id: String(journalEntry_id),
+      },
+    ],
+    async () =>
+      await getJournalEntry("1", String(client_id), String(journalEntry_id))
+  );
+
+  const {
+    isLoading: isServicesLoading,
+    error: servicesError,
+    data: servicesData,
+    refetch: refetchServices,
+  } = useQuery<Service[], Error>(
+    ["services", {}],
+    async () => await getAllServices("1")
+  );
 
   useEffect(() => {
-    const fetchEntry = async () => {
-      if (journalEntry_id && client_id) {
-        const fetchedEntry: JournalEntry = await getJournalEntry(
-          "1",
-          client_id,
-          journalEntry_id
-        );
-        setEntry(fetchedEntry);
-      }
-    };
-
-    fetchEntry();
-  }, [journalEntry_id, client_id]);
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      const fetchedServices: Service[] = await getAllServices("1");
-      setServices(fetchedServices);
-    };
-    fetchServices();
-  }, ["1"]);
-
-  useEffect(() => {
-    if (entry) {
-      setJournalData([
+    if (!isEntryLoading && !isServicesLoading) {
+      const initialData: JournalEntryItem[] = [
         {
           title: "Service",
-          value: entry.Service.service_name,
+          value: entryData?.Service.service_name || "No Service",
           type: "dropdown",
-          options: services.map((service) => service.service_name) || [],
+          options:
+            servicesData?.flatMap((service) => service.service_name) || [],
         },
         {
           title: "Price",
-          value: entry.price || "0",
+          value: entryData?.price || "0",
           isNumeric: true,
           isCurrency: true,
         },
         {
           title: "Status",
-          value: entry.status,
+          value: entryData?.status || "No Status",
           type: "dropdown",
           options: ["Not Started", "In Progress", "Completed"],
         },
-      ]);
-    }
-  }, [entry]);
+      ];
 
-  const serviceDates = entry?.serviceDates.reduce(
+      setJournalData(initialData);
+      seTempJournalData(initialData);
+    }
+  }, [isEntryLoading]);
+
+  const serviceDates = entryData?.serviceDates.reduce(
     (markedDates, serviceDate) => {
       const formattedDate = new Date(serviceDate.service_date)
         .toISOString()
@@ -124,11 +129,11 @@ const JournalEntryScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const service_id = services.find(
+      const service_id = servicesData?.find(
         (item) => item.service_name === journalEntry[0].value
       )?.service_id;
 
-      const updateEntry = await updateJournalEntry(journalEntry_id ?? "", {
+      await updateJournalEntry(journalEntry_id ?? "", {
         service_id: service_id,
         price: journalEntry[1].value,
         status: journalEntry[2].value,
@@ -220,7 +225,11 @@ const JournalEntryScreen = () => {
 
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
-              onPress={() => setEditable(false)}
+              onPress={() => {
+                setEditable(false);
+                refetchEntry();
+                setJournalData([...tempJournalData]);
+              }}
             >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>

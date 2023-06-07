@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -11,34 +12,46 @@ import normalizeName from "../util/NormalizeName";
 
 const ClientScreen = () => {
   const { client_id } = useLocalSearchParams();
-  const [client, setClient] = useState<Client>();
-  const [journal, setJournal] = useState<JournalEntry[]>([]);
 
-  useEffect(() => {
-    const fetchClient = async () => {
-      if (typeof client_id === "string") {
-        const fetchedClient: Client = await getSingleClient("1", client_id);
-        setClient(fetchedClient);
+  const queryClient = useQueryClient();
 
-        const fetchedJournal: JournalEntry[] = await getClientJournal(
-          "1",
-          client_id
-        );
-        setJournal(fetchedJournal);
-      }
-    };
+  const {
+    isLoading: isClientLoading,
+    error: clientError,
+    data: clientData,
+    refetch: refetchClient,
+  } = useQuery<Client, Error>(
+    ["client", { client_id: String(client_id) }],
+    async () => await getSingleClient("1", String(client_id))
+  );
 
-    fetchClient();
-  }, [client_id]);
+  const {
+    isLoading: isJournalLoading,
+    error: journalError,
+    data: journalData,
+    refetch: refetchJournal,
+  } = useQuery<JournalEntry[], Error>(
+    ["journal", { client_id: String(client_id) }],
+    async () => await getClientJournal("1", String(client_id))
+  );
 
-  const clientData = [
-    { title: "City", value: client?.city ?? "No City" },
-    { title: "Street", value: client?.street ?? "No Street" },
+  const displayClientData = [
+    { title: "City", value: clientData?.city ?? "No City" },
+    { title: "Street", value: clientData?.street ?? "No Street" },
     {
       title: "House",
-      value: client?.house_number.toString() ?? "No House Number",
+      value: clientData?.house_number.toString() ?? "No House Number",
     },
   ];
+
+  if (clientError)
+    return (
+      <Text style={{ color: Colors.error }}>Error: {clientError.message}</Text>
+    );
+  if (journalError)
+    return (
+      <Text style={{ color: Colors.error }}>Error: {journalError.message}</Text>
+    );
 
   return (
     <View
@@ -48,27 +61,31 @@ const ClientScreen = () => {
         flexGrow: 1,
       }}
     >
-      {client === undefined ? (
-        <Text style={{ color: Colors.error }}>CLIENT is undefined</Text>
-      ) : (
-        <View>
+      <View>
+        {isClientLoading ? (
+          <Text>Loading Client...</Text>
+        ) : (
           <Stack.Screen
             options={{
-              headerTitle: `${normalizeName(client)}`,
+              headerTitle: `${normalizeName(clientData)}`,
               headerTitleAlign: "center",
               headerStyle: { backgroundColor: "#858cc7" },
             }}
           />
-          <View style={{ height: "100%" }}>
-            <InfoContainer
-              data={clientData}
-              title={"Client Information"}
-              onUpdate={() => {}}
-            />
-            <JournalView journalEntries={journal} />
-          </View>
+        )}
+        <View style={{ height: "100%" }}>
+          <InfoContainer
+            data={displayClientData}
+            title={"Client Information"}
+            onUpdate={() => {}}
+          />
+          {isJournalLoading ? (
+            <Text> Loading Journal...</Text>
+          ) : (
+            <JournalView journalEntries={journalData} />
+          )}
         </View>
-      )}
+      </View>
     </View>
   );
 };
