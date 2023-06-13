@@ -1,17 +1,66 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+} from "react-native";
 import TextInputComponent from "../../components/Input Components/TextInputComponent";
 import CustomButton from "../../components/CustomButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import GoogleIcon from "../../components/Custom SVGs/GoogleIcon";
+import { FIREBASE_AUTH } from "../../../FirebaseConfig";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { createNewUser } from "../../api";
 
-const LoginScreen = () => {
+const SignInScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [signUpMode, setSignUpMode] = useState(true);
+  const auth = FIREBASE_AUTH;
 
-  const handleLogin = () => {
-    // Perform login logic here
+  const handleSignIn = async () => {
+    setLoading(true);
+    try {
+      const response = await signInWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.log(error);
+      alert("Login Failed" + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ).then((userCredential) => {
+        const firebaseUserId = userCredential.user.uid;
+
+        userCredential.user.getIdToken(false).then((idToken) => {
+          createNewUser(idToken, firebaseUserId, "name", "company");
+          console.log(response);
+          alert("Sign Up Successful, Check your email!");
+        });
+      });
+    } catch (error: any) {
+      console.log(error);
+      alert("Sign Up Failed" + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,7 +72,7 @@ const LoginScreen = () => {
         backgroundColor: Colors.dark_green[100],
       }}
     >
-      <View style={styles.logoView}>
+      <View>
         <Text style={[styles.logoText, { fontWeight: "400" }]}>
           Welcome to your
         </Text>
@@ -64,44 +113,60 @@ const LoginScreen = () => {
               <Text style={styles.dividerText}>or continue with email</Text>
             </View>
           </View>
-          <View style={styles.textInputView}>
-            <Text style={styles.textInputTitle}>Email</Text>
-            <TextInputComponent
-              style={styles.editableTextInput}
-              onChangeText={(text) => setEmail(text)}
-              value={email}
-              placeholder="Required"
-              textContentType="emailAddress"
-              keyboardType="email-address"
-            />
-          </View>
-          <View style={styles.textInputView}>
-            <Text style={styles.textInputTitle}>Password</Text>
-            <TextInputComponent
-              style={styles.editableTextInput}
-              onChangeText={(text) => setPassword(text)}
-              value={password}
-              placeholder="At least 8 characters"
-              secureTextEntry={true}
-              autoCorrect={false}
-              autoCapitalize="none"
-              textContentType="newPassword"
-              onValueChange={(text) => setPassword(text)}
-            />
-          </View>
-          <CustomButton
-            style={styles.loginButton}
-            onPress={handleLogin}
-            customColors={{
-              defaultColor: "#a8e26a",
-              pressedColor: Colors.dark_green[500],
-            }}
-          >
-            <Text style={styles.buttonText}> SIGN IN </Text>
-          </CustomButton>
+          <KeyboardAvoidingView behavior="padding">
+            <View style={styles.textInputView}>
+              <Text style={styles.textInputTitle}>Email</Text>
+              <TextInputComponent
+                style={styles.editableTextInput}
+                onChangeText={(text) => setEmail(text)}
+                value={email}
+                placeholder="Required"
+                textContentType="emailAddress"
+                keyboardType="email-address"
+              />
+            </View>
+            <View style={styles.textInputView}>
+              <Text style={styles.textInputTitle}>Password</Text>
+              <TextInputComponent
+                style={styles.editableTextInput}
+                onChangeText={(text) => setPassword(text)}
+                value={password}
+                placeholder="At least 8 characters"
+                secureTextEntry={true}
+                autoCorrect={false}
+                autoCapitalize="none"
+                textContentType="newPassword"
+                onValueChange={(text) => setPassword(text)}
+              />
+            </View>
+          </KeyboardAvoidingView>
+          {loading ? (
+            <ActivityIndicator size={"large"} color={Colors.dark_green[500]} />
+          ) : (
+            <CustomButton
+              style={styles.loginButton}
+              onPress={signUpMode ? handleSignUp : handleSignIn}
+              customColors={{
+                defaultColor: "#a8e26a",
+                pressedColor: Colors.dark_green[500],
+              }}
+            >
+              <Text style={styles.buttonText}>
+                {signUpMode ? "Create an account" : "SIGN IN"}
+              </Text>
+            </CustomButton>
+          )}
+
           <View style={styles.loginLinkContainer}>
-            <Text style={styles.loginText}>Already a user? </Text>
-            <Text style={styles.loginLink}>LOGIN</Text>
+            <Text style={styles.loginText}>
+              {signUpMode ? "Already have an account? " : "Need an account? "}
+            </Text>
+            <Text
+              style={styles.loginLink}
+              onPress={() => setSignUpMode(!signUpMode)}
+            >
+              {signUpMode ? "SIGN IN" : "SIGN UP"}
+            </Text>
           </View>
         </View>
       </View>
@@ -109,7 +174,7 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default SignInScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -121,12 +186,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     elevation: 5,
   },
-  logoView: {
-    alignSelf: "flex-start",
-    marginLeft: 20,
-  },
   logoText: {
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 30,
     fontWeight: "600",
     color: "white",
