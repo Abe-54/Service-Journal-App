@@ -1,65 +1,53 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-} from "react-native";
-import TextInputComponent from "../../components/Input Components/TextInputComponent";
-import CustomButton from "../../components/CustomButton";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Colors from "../../constants/Colors";
-import GoogleIcon from "../../components/Custom SVGs/GoogleIcon";
-import { FIREBASE_AUTH } from "../../../FirebaseConfig";
+import { useRouter } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Button,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { FIREBASE_AUTH } from "../../../FirebaseConfig";
 import { createNewUser } from "../../api";
+import GoogleIcon from "../../components/Custom SVGs/GoogleIcon";
+import CustomButton from "../../components/CustomButton";
+import TextInputComponent from "../../components/Input Components/TextInputComponent";
+import Colors from "../../constants/Colors";
+import useAuthStore from "../../stores/AuthStore";
 
 const SignInScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [signUpMode, setSignUpMode] = useState(true);
-  const auth = FIREBASE_AUTH;
+  const { login, signup, toggleSignUpMode, signUpMode, user, isLoading } =
+    useAuthStore((state) => ({
+      login: state.signin,
+      signup: state.signup,
+      toggleSignUpMode: state.toggleSignUpMode,
+      signUpMode: state.signUpMode,
+      user: state.user,
+      isLoading: state.isLoading,
+    }));
+  const router = useRouter();
 
   const handleSignIn = async () => {
-    setLoading(true);
-    try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      console.log(error);
-      alert("Login Failed" + error.message);
-    } finally {
-      setLoading(false);
+    await login(email, password);
+    if (user) {
+      router.replace("/(tabs)/clientsTab");
     }
   };
 
   const handleSignUp = async () => {
-    setLoading(true);
-    try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      ).then((userCredential) => {
-        const firebaseUserId = userCredential.user.uid;
-
-        userCredential.user.getIdToken(false).then((idToken) => {
-          createNewUser(idToken, firebaseUserId, "name", "company");
-          console.log(response);
-          alert("Sign Up Successful, Check your email!");
-        });
-      });
-    } catch (error: any) {
-      console.log(error);
-      alert("Sign Up Failed" + error.message);
-    } finally {
-      setLoading(false);
+    await signup(email, password);
+    toggleSignUpMode();
+    if (user) {
+      router.replace("/(tabs)/clientsTab");
     }
   };
 
@@ -140,7 +128,7 @@ const SignInScreen = () => {
               />
             </View>
           </KeyboardAvoidingView>
-          {loading ? (
+          {isLoading ? (
             <ActivityIndicator size={"large"} color={Colors.dark_green[500]} />
           ) : (
             <CustomButton
@@ -161,10 +149,7 @@ const SignInScreen = () => {
             <Text style={styles.loginText}>
               {signUpMode ? "Already have an account? " : "Need an account? "}
             </Text>
-            <Text
-              style={styles.loginLink}
-              onPress={() => setSignUpMode(!signUpMode)}
-            >
+            <Text style={styles.loginLink} onPress={toggleSignUpMode}>
               {signUpMode ? "SIGN IN" : "SIGN UP"}
             </Text>
           </View>

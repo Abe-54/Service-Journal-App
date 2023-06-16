@@ -22,7 +22,7 @@ const StackLayout = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack screenOptions={{headerShown: false}}/>
+      <Stack screenOptions={{ headerShown: false }} />
     </QueryClientProvider>
   );
 };
