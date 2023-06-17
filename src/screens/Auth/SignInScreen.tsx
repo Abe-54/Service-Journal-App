@@ -21,6 +21,7 @@ import CustomButton from "../../components/CustomButton";
 import TextInputComponent from "../../components/Input Components/TextInputComponent";
 import Colors from "../../constants/Colors";
 import useAuthStore from "../../stores/AuthStore";
+import useUserStore from "../../stores/UserStore";
 
 const SignInScreen = () => {
   const [email, setEmail] = useState("");
@@ -37,16 +38,16 @@ const SignInScreen = () => {
   const router = useRouter();
 
   const handleSignIn = async () => {
-    await login(email, password);
-    if (user) {
+    const loggedIn = await login(email, password);
+    if (loggedIn) {
       router.replace("/(tabs)/clientsTab");
     }
   };
 
   const handleSignUp = async () => {
-    await signup(email, password);
+    const signedUp = await signup(email, password);
     toggleSignUpMode();
-    if (user) {
+    if (user && signedUp) {
       router.replace("/(tabs)/clientsTab");
     }
   };

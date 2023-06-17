@@ -1,13 +1,27 @@
 import { API_BASE_URL } from "@env";
 import axios from "axios";
 import { UserCredential } from "firebase/auth";
+import useUserStore from "./stores/UserStore";
 
 const serviceJournalURL = axios.create({
   baseURL: API_BASE_URL,
 });
 
+serviceJournalURL.interceptors.request.use(
+  (config) => {
+    const userCredentials = useUserStore.getState().userCredentials;
+    if (userCredentials) {
+      config.headers.Authorization = `Bearer ${userCredentials}`;
+    }
+    return config;
+  },
+  (error) => {
+    console.error("Request interceptor error:", error);
+    return Promise.reject(error);
+  }
+);
+
 export const createNewUser = async (
-  userCredentials: string,
   userId: string,
   user_name: string,
   company_name: string
@@ -18,8 +32,7 @@ export const createNewUser = async (
       user_id: userId,
       user_name: user_name,
       company_name: company_name,
-    },
-    { headers: { Authorization: `Bearer ${userCredentials}` } }
+    }
   );
   console.log(res.data);
   return res.data;

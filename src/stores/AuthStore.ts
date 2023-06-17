@@ -1,14 +1,16 @@
+import * as SecureStore from "expo-secure-store";
 import {
-    Auth,
-    User,
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signOut,
+  User,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
-import create from "zustand";
+import { Platform } from "react-native";
+import { create } from "zustand";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import { createNewUser } from "../api";
+import useUserStore from "./UserStore";
 
 const auth = FIREBASE_AUTH;
 
@@ -17,13 +19,16 @@ type AuthStoreState = {
   isLoggedIn: boolean;
   isLoading: boolean;
   signUpMode: boolean;
-  signin: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+};
+
+type AuthStoreActions = {
+  signin: (email: string, password: string) => Promise<boolean>;
+  signup: (email: string, password: string) => Promise<boolean>;
   signout: () => Promise<void>;
   toggleSignUpMode: () => void;
 };
 
-const useAuthStore = create<AuthStoreState>((set) => ({
+const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
   user: null,
   isLoggedIn: false,
   isLoading: false,
@@ -33,9 +38,19 @@ const useAuthStore = create<AuthStoreState>((set) => ({
     try {
       set({ isLoading: true });
       const response = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUserId = response.user.uid;
+      const idToken = await response.user.getIdToken(false);
+
+      console.log("firebaseUserId: ", firebaseUserId);
+      await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
+      await SecureStore.setItemAsync("idToken", idToken);
+
       console.log(response);
+      
+      return true;
     } catch (error) {
       console.error("Login error:", error);
+      return false;
     } finally {
       set({ isLoading: false });
     }
@@ -51,18 +66,28 @@ const useAuthStore = create<AuthStoreState>((set) => ({
       const firebaseUserId = userCredential.user.uid;
       const idToken = await userCredential.user.getIdToken(false);
 
-      createNewUser(idToken, firebaseUserId, "name", "company");
+      console.log("firebaseUserId: ", firebaseUserId);
+      await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
+      await SecureStore.setItemAsync("idToken", idToken);
+
+      createNewUser(firebaseUserId, "Name", "Company Name");
+
       console.log(userCredential);
-      alert("Sign Up Successful, Check your email!");
+      alert("Sign Up Successful");
+      return true;
     } catch (error) {
       // Handle signup error
       console.error("Signup error:", error);
+      return false;
     } finally {
       set({ isLoading: false });
     }
   },
   signout: async () => {
     try {
+      await SecureStore.deleteItemAsync("firebaseUserId");
+      await SecureStore.deleteItemAsync("idToken");
+
       await signOut(auth);
       set({ user: null, isLoggedIn: false });
     } catch (error) {
@@ -71,8 +96,16 @@ const useAuthStore = create<AuthStoreState>((set) => ({
   },
 }));
 
-onAuthStateChanged(auth, (user) => {
-  useAuthStore.setState({ user, isLoggedIn: !!user });
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const userId = await SecureStore.getItemAsync("userId");
+    const userCredentials = await SecureStore.getItemAsync("idToken");
+    useAuthStore.setState({ user, isLoggedIn: !!user });
+    useUserStore.setState({ userCredentials, userId });
+  } else {
+    useAuthStore.setState({ user: null, isLoggedIn: false });
+    useUserStore.setState({ userCredentials: null, userId: null });
+  }
 });
 
 export default useAuthStore;

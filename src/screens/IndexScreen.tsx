@@ -9,7 +9,7 @@ const StartPage = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      router.push("/clientsTab"); // Replace "/home" with the path to your authenticated screen
+      router.push("/(tabs)/clientsTab");
     }
   }, [isLoggedIn]);
 

@@ -8,12 +8,14 @@ import InfoContainer from "../components/InfoContainer";
 import JournalView from "../components/Journal View/JournalView";
 import Colors from "../constants/Colors";
 import { JournalEntry } from "../interfaces/JournalEntry";
+import useUserStore from "../stores/UserStore";
 import normalizeName from "../util/NormalizeName";
 
 const ClientScreen = () => {
   const { client_id } = useLocalSearchParams();
-
-  const queryClient = useQueryClient();
+  const { userId } = useUserStore((state) => ({
+    userId: state.userId,
+  }));
 
   const {
     isLoading: isClientLoading,
@@ -22,7 +24,8 @@ const ClientScreen = () => {
     refetch: refetchClient,
   } = useQuery<Client, Error>(
     ["client", { client_id: String(client_id) }],
-    async () => await getSingleClient("1", String(client_id))
+    async () =>
+      await getSingleClient(userId ?? "NO ID FOUND", String(client_id))
   );
 
   const {
@@ -32,7 +35,8 @@ const ClientScreen = () => {
     refetch: refetchJournal,
   } = useQuery<JournalEntry[], Error>(
     ["journal", { client_id: String(client_id) }],
-    async () => await getClientJournal("1", String(client_id))
+    async () =>
+      await getClientJournal(userId ?? "NO ID FOUND", String(client_id))
   );
 
   const displayClientData = [
