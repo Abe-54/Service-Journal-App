@@ -42,11 +42,19 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
       const idToken = await response.user.getIdToken(false);
 
       console.log("firebaseUserId: ", firebaseUserId);
-      await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
-      await SecureStore.setItemAsync("idToken", idToken);
+
+      if (Platform.OS === "web") {
+        console.log("web");
+        localStorage.setItem("firebaseUserId", firebaseUserId);
+        localStorage.setItem("idToken", idToken);
+      } else {
+        console.log("mobile");
+        await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
+        await SecureStore.setItemAsync("idToken", idToken);
+      }
 
       console.log(response);
-      
+
       return true;
     } catch (error) {
       console.error("Login error:", error);
@@ -67,8 +75,14 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
       const idToken = await userCredential.user.getIdToken(false);
 
       console.log("firebaseUserId: ", firebaseUserId);
-      await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
-      await SecureStore.setItemAsync("idToken", idToken);
+
+      if (Platform.OS === "web") {
+        localStorage.setItem("firebaseUserId", firebaseUserId);
+        localStorage.setItem("idToken", idToken);
+      } else {
+        await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
+        await SecureStore.setItemAsync("idToken", idToken);
+      }
 
       createNewUser(firebaseUserId, "Name", "Company Name");
 
@@ -87,7 +101,6 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
     try {
       await SecureStore.deleteItemAsync("firebaseUserId");
       await SecureStore.deleteItemAsync("idToken");
-
       await signOut(auth);
       set({ user: null, isLoggedIn: false });
     } catch (error) {
@@ -96,15 +109,11 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
   },
 }));
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (user) {
-    const userId = await SecureStore.getItemAsync("userId");
-    const userCredentials = await SecureStore.getItemAsync("idToken");
     useAuthStore.setState({ user, isLoggedIn: !!user });
-    useUserStore.setState({ userCredentials, userId });
   } else {
     useAuthStore.setState({ user: null, isLoggedIn: false });
-    useUserStore.setState({ userCredentials: null, userId: null });
   }
 });
 
