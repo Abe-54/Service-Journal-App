@@ -1,9 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -14,14 +9,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { FIREBASE_AUTH } from "../../../FirebaseConfig";
-import { createNewUser } from "../../api";
 import GoogleIcon from "../../components/Custom SVGs/GoogleIcon";
 import CustomButton from "../../components/CustomButton";
 import TextInputComponent from "../../components/Input Components/TextInputComponent";
 import Colors from "../../constants/Colors";
 import useAuthStore from "../../stores/AuthStore";
-import useUserStore from "../../stores/UserStore";
 
 const SignInScreen = () => {
   const [email, setEmail] = useState("");

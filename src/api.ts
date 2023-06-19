@@ -8,8 +8,8 @@ const serviceJournalURL = axios.create({
 });
 
 serviceJournalURL.interceptors.request.use(
-  (config) => {
-    const userCredentials = useUserStore.getState().userCredentials;
+  async (config) => {
+    const userCredentials = await useUserStore.getState().userCredentials();
     if (userCredentials) {
       config.headers.Authorization = `Bearer ${userCredentials}`;
     }
@@ -26,14 +26,17 @@ export const createNewUser = async (
   user_name: string,
   company_name: string
 ) => {
-  const res = await serviceJournalURL.post(
-    "/create/user",
-    {
-      user_id: userId,
-      user_name: user_name,
-      company_name: company_name,
-    }
-  );
+  const res = await serviceJournalURL.post("/create/user", {
+    user_id: userId,
+    user_name: user_name,
+    company_name: company_name,
+  });
+  console.log(res.data);
+  return res.data;
+};
+
+export const getUser = async (userId: string) => {
+  const res = await serviceJournalURL.get(`${userId}`);
   console.log(res.data);
   return res.data;
 };

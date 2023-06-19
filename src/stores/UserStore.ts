@@ -4,37 +4,42 @@ import { create } from "zustand";
 import { createNewUser } from "../api";
 import useAuthStore from "./AuthStore";
 
-type UserStoreState = {
-  userCredentials: string | null;
-  userId: string | null;
-};
-
 type UserStoreActions = {
-  getUserCredentials: () => void;
-  getUserId: () => void;
+  userCredentials: () => Promise<string | null>;
+  userId: () => Promise<string | null>;
 };
 
-const getUserCredentialsFromStorage = () => {
+const useUserStore = create<UserStoreActions>((set) => ({
+  userCredentials: async () => {
+    return getUserCredentialsFromStorage();
+  },
+  userId: async () => {
+    return getUserIdFromStorage();
+  },
+}));
+
+const getUserCredentialsFromStorage = async () => {
   let userCredentials = null;
-  SecureStore.getItemAsync("userCredentials").then((credentials) => {
-    userCredentials = credentials;
-  });
+
+  if (Platform.OS === "web") {
+    userCredentials = localStorage.getItem("idToken");
+  } else {
+    userCredentials = await SecureStore.getItemAsync("idToken");
+  }
+
   return userCredentials;
 };
 
-const getUserIdFromStorage = () => {
+const getUserIdFromStorage = async () => {
   let userId = null;
-  SecureStore.getItemAsync("userId").then((id) => {
-    userId = id;
-  });
+
+  if (Platform.OS === "web") {
+    userId = localStorage.getItem("firebaseUserId");
+  } else {
+    userId = await SecureStore.getItemAsync("firebaseUserId");
+  }
+
   return userId;
 };
-
-const useUserStore = create<UserStoreState & UserStoreActions>((set) => ({
-  userCredentials: null,
-  userId: null,
-  getUserCredentials: getUserCredentialsFromStorage,
-  getUserId: getUserIdFromStorage,
-}));
 
 export default useUserStore;

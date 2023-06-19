@@ -13,8 +13,8 @@ import normalizeName from "../util/NormalizeName";
 
 const ClientScreen = () => {
   const { client_id } = useLocalSearchParams();
-  const { userId } = useUserStore((state) => ({
-    userId: state.userId,
+  const { getUserId } = useUserStore((state) => ({
+    getUserId: state.userId,
   }));
 
   const {
@@ -24,8 +24,11 @@ const ClientScreen = () => {
     refetch: refetchClient,
   } = useQuery<Client, Error>(
     ["client", { client_id: String(client_id) }],
-    async () =>
-      await getSingleClient(userId ?? "NO ID FOUND", String(client_id))
+    async () => {
+      const id = (await getUserId()) ?? "NO ID FOUND";
+      const client = await getSingleClient(id, String(client_id));
+      return client;
+    }
   );
 
   const {
@@ -35,8 +38,14 @@ const ClientScreen = () => {
     refetch: refetchJournal,
   } = useQuery<JournalEntry[], Error>(
     ["journal", { client_id: String(client_id) }],
-    async () =>
-      await getClientJournal(userId ?? "NO ID FOUND", String(client_id))
+    async () => {
+      const id = (await getUserId()) ?? "NO ID FOUND";
+      const journal = await getClientJournal(
+        id ?? "NO ID FOUND",
+        String(client_id)
+      );
+      return journal;
+    }
   );
 
   const displayClientData = [
