@@ -35,6 +35,36 @@ export const createNewUser = async (
   return res.data;
 };
 
+export const createNewClient = async (
+  userId: string,
+  client_name: string,
+  house_number: number,
+  street: string,
+  city: string
+) => {
+  const res = await serviceJournalURL.post(`${userId}/clients/new`, {
+    client_name: client_name,
+    house_number: house_number,
+    street: street,
+    city: city,
+  });
+  console.log(res.data);
+  return res.data;
+};
+
+export const deleteClient = async (userId: string, clientId: number) => {
+  const res = await serviceJournalURL.delete(
+    `${userId}/clients/delete/single`,
+    {
+      data: {
+        client_id: clientId,
+      },
+    }
+  );
+  console.log(res.data);
+  return res.data;
+};
+
 export const getUser = async (userId: string) => {
   const res = await serviceJournalURL.get(`${userId}`);
   console.log(res.data);

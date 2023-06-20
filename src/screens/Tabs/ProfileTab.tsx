@@ -1,7 +1,9 @@
+import * as DocumentPicker from "expo-document-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { getUser } from "../../api";
+import { readString } from "react-native-csv";
+import { createNewClient, getUser } from "../../api";
 import CustomButton from "../../components/CustomButton";
 import Colors from "../../constants/Colors";
 import useAuthStore from "../../stores/AuthStore";
@@ -30,14 +32,67 @@ const ProfileTab = () => {
     console.log("LOGGED OUT");
   };
 
+  const handleImportClients = async () => {
+    try {
+      const res = await DocumentPicker.getDocumentAsync({
+        type: ["text/csv", "text/comma-separated-values"],
+        copyToCacheDirectory: true,
+      });
+
+      if (res.type === "cancel") {
+        console.log("cancelled");
+        return null;
+      }
+
+      console.log("Selected file name:", res.name);
+      console.log(`Selected file size: ${res.size} bytes`);
+      console.log(`Selected file uri: ${res.uri}`);
+      console.log(`Selected file mime type: ${res.mimeType}`);
+
+      const file = await fetch(res.uri);
+      const fileData = readString(await file.text(), { header: true });
+
+      console.log(fileData.data);
+
+      //create new clients from fileData
+
+      const id = await getUserId();
+
+      fileData.data.forEach(async (client: any) => {
+        const res = await createNewClient(
+          id ?? "NO ID FOUND",
+          client.Customer,
+          parseInt(client.HouseNumber),
+          client.Street,
+          client.City
+        );
+        console.log(res);
+      });
+
+      //send new clients to backend
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.profileInfo}>
-        <Text style={styles.profileText}>{user ? user.company_name : ""}</Text>
+        <Text style={styles.profileText}>
+          Company: {user ? user.company_name : ""}
+        </Text>
+        <View style={styles.buttonsView}>
+          <CustomButton style={[styles.profileButton]} onPress={handleLogOut}>
+            <Text style={styles.profileLogOutText}>Log Out</Text>
+          </CustomButton>
+          <CustomButton
+            style={[styles.profileButton]}
+            onPress={handleImportClients}
+          >
+            <Text style={styles.profileLogOutText}>Import Clients</Text>
+          </CustomButton>
+        </View>
       </View>
-      <CustomButton style={styles.profileLogOutButton} onPress={handleLogOut}>
-        <Text style={styles.profileLogOutText}>Log Out</Text>
-      </CustomButton>
     </SafeAreaView>
   );
 };
@@ -50,20 +105,20 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     display: "flex",
-    justifyContent: "flex-start",
+    flexGrow: 1,
+    justifyContent: "space-between",
     alignItems: "center",
-    margin: 100,
+    marginVertical: 50,
   },
   profileText: {
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
   },
-  profileLogOutButton: {
+  profileButton: {
     display: "flex",
     alignSelf: "stretch",
-    padding: 10,
-    margin: 50,
+    paddingVertical: 10,
     borderRadius: 15,
     elevation: 5,
   },
@@ -72,6 +127,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 24,
     fontWeight: "bold",
+  },
+  buttonsView: {
+    display: "flex",
+    flexGrow: 1,
+    justifyContent: "space-between",
+    alignSelf: "stretch",
+    margin: 50,
   },
 });
 

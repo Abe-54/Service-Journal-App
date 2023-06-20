@@ -1,9 +1,10 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Client } from "../../src/interfaces/Client";
-import { getClientJournal, getSingleClient } from "../api";
+import { deleteClient, getClientJournal, getSingleClient } from "../api";
 import InfoContainer from "../components/InfoContainer";
 import JournalView from "../components/Journal View/JournalView";
 import Colors from "../constants/Colors";
@@ -16,6 +17,7 @@ const ClientScreen = () => {
   const { getUserId } = useUserStore((state) => ({
     getUserId: state.userId,
   }));
+  const router = useRouter();
 
   const {
     isLoading: isClientLoading,
@@ -57,6 +59,14 @@ const ClientScreen = () => {
     },
   ];
 
+  const handleDeleteClient = async (id: number) => {
+    const userId = await getUserId();
+    if (userId) {
+      await deleteClient(userId, id);
+      router.replace("/");
+    }
+  };
+
   if (clientError)
     return (
       <Text style={{ color: Colors.error }}>Error: {clientError.message}</Text>
@@ -83,6 +93,16 @@ const ClientScreen = () => {
               headerTitle: `${normalizeName(clientData)}`,
               headerTitleAlign: "center",
               headerStyle: { backgroundColor: "#858cc7" },
+              headerRight: () => (
+                <MaterialCommunityIcons
+                  name="account-remove"
+                  size={24}
+                  color="white"
+                  onPress={() =>
+                    handleDeleteClient(parseInt(String(client_id)))
+                  }
+                />
+              ),
             }}
           />
         )}

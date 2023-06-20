@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -33,6 +33,12 @@ const clientsTab = () => {
   const { isLoading, error, data, refetch } = useQuery<Client[], Error>(
     ["client", { client_id: userId ?? "NO ID FOUND" }],
     async () => await getClients(userId ?? "NO ID FOUND")
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [])
   );
 
   const handleClientPress = (clientId: string) => {

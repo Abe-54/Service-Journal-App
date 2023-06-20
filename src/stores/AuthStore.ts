@@ -99,8 +99,13 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
   },
   signout: async () => {
     try {
-      await SecureStore.deleteItemAsync("firebaseUserId");
-      await SecureStore.deleteItemAsync("idToken");
+      if (Platform.OS === "web") {
+        localStorage.removeItem("firebaseUserId");
+        localStorage.removeItem("idToken");
+      } else {
+        await SecureStore.deleteItemAsync("firebaseUserId");
+        await SecureStore.deleteItemAsync("idToken");
+      }
       await signOut(auth);
       set({ user: null, isLoggedIn: false });
     } catch (error) {
