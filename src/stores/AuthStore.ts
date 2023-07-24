@@ -10,7 +10,6 @@ import { Platform } from "react-native";
 import { create } from "zustand";
 import { FIREBASE_AUTH } from "../../FirebaseConfig";
 import { createNewUser } from "../api";
-import useUserStore from "./UserStore";
 
 const auth = FIREBASE_AUTH;
 
@@ -39,7 +38,7 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
       set({ isLoading: true });
       const response = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUserId = response.user.uid;
-      const idToken = await response.user.getIdToken(false);
+      const idToken = await response.user.getIdToken(true);
 
       console.log("firebaseUserId: ", firebaseUserId);
 
@@ -72,7 +71,7 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
         password
       );
       const firebaseUserId = userCredential.user.uid;
-      const idToken = await userCredential.user.getIdToken(false);
+      const idToken = await userCredential.user.getIdToken(true);
 
       console.log("firebaseUserId: ", firebaseUserId);
 

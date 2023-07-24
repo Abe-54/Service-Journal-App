@@ -1,55 +1,133 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import DropDownPicker, {
-  DropDownPickerProps,
-} from "react-native-dropdown-picker";
-type DropdownPickerProps = DropDownPickerProps<string> & {
-  value: string;
-  items: Array<{ label: string; value: string }>;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
-};
+import { AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Text, View } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import Colors from "../../constants/Colors";
 
-const DropdownPickerComponent = ({
+interface DropdownComponentProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  data: Array<{ label: string; value: string }>;
+  placeholder: string;
+  searchPlaceholder?: string;
+  renderLeftIcon?: () => JSX.Element;
+  customStyles?: {
+    container?: object;
+    labelText?: object;
+    dropdownListContainer?: object;
+    dropdown?: object;
+    icon?: object;
+    placeholderStyle?: object;
+    selectedTextStyle?: object;
+    iconStyle?: object;
+    inputSearchStyle?: object;
+  };
+  activeColor?: string;
+  canSearch?: boolean;
+}
+
+const DropdownComponent = ({
+  label,
   value,
-  items,
-  open,
-  setOpen,
-  setValue,
-}: DropdownPickerProps) => {
+  onChange,
+  data,
+  placeholder,
+  searchPlaceholder,
+  renderLeftIcon,
+  customStyles,
+  activeColor,
+  canSearch = true,
+}: DropdownComponentProps) => {
+  const [isFocus, setIsFocus] = useState(false);
+
+  const defaultRenderLeftIcon = () => (
+    <AntDesign
+      style={[styles.icon, customStyles?.icon]}
+      color={isFocus ? "blue" : "black"}
+      name="user"
+      size={20}
+    />
+  );
+
+  const leftIcon = renderLeftIcon ? renderLeftIcon() : defaultRenderLeftIcon();
+
+  const mergedStyles = { ...styles, ...customStyles };
+
   return (
-    <View style={styles.container}>
-      <DropDownPicker
+    <View style={mergedStyles.container}>
+      <Text style={mergedStyles.labelText}>{label}:</Text>
+      <Dropdown
+        style={[mergedStyles.dropdown]}
+        containerStyle={mergedStyles.dropdownListContainer}
+        placeholderStyle={mergedStyles.placeholderStyle}
+        selectedTextStyle={mergedStyles.selectedTextStyle}
+        inputSearchStyle={mergedStyles.inputSearchStyle}
+        iconStyle={mergedStyles.iconStyle}
+        activeColor={activeColor ? activeColor : Colors.royal_blue[100]}
+        data={data}
+        search={canSearch}
+        maxHeight={200}
+        labelField="label"
+        valueField="value"
+        placeholder={placeholder}
+        searchPlaceholder={canSearch ? searchPlaceholder : ""}
         value={value}
-        items={items}
-        open={open}
-        setOpen={setOpen}
-        setValue={setValue}
-        labelStyle={styles.dropdownLabel}
-        containerStyle={styles.dropdownContainer}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={(item) => {
+          onChange(item.value);
+          setIsFocus(false);
+        }}
+        renderLeftIcon={() => leftIcon}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    width: "100%",
+    borderRadius: 8,
+    display: "flex",
+    marginHorizontal: 20,
+    rowGap: 5,
   },
-  dropdownContainer: {
-    marginHorizontal: 15,
+  labelText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  dropdownListContainer: {
+    borderRadius: 8,
+    backgroundColor: Colors.royal_blue[300],
   },
   dropdown: {
-    backgroundColor: "white",
-    borderWidth: 1,
+    paddingVertical: 8,
     borderColor: "gray",
+    borderWidth: 0.5,
     borderRadius: 8,
+    paddingHorizontal: 8,
+    backgroundColor: Colors.royal_blue[300],
   },
-  dropdownLabel: {
+  icon: {
+    marginRight: 5,
+  },
+  placeholderStyle: {
     fontSize: 16,
-    color: "black",
   },
-});
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+    borderRadius: 8,
+    backgroundColor: "white",
+  },
+};
 
-export default DropdownPickerComponent;
+export default DropdownComponent;

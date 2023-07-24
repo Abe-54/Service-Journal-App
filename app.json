@@ -6,7 +6,9 @@
     "orientation": "portrait",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.abe54.servicejournal"
     },
@@ -22,6 +24,9 @@
         "projectId": "212e965d-effe-44cf-a056-334829dabf76"
       }
     },
-    "owner": "abe-54"
+    "owner": "abe-54",
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

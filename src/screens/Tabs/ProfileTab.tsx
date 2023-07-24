@@ -1,7 +1,8 @@
 import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { readString } from "react-native-csv";
 import { createNewClient, getUser } from "../../api";
 import CustomButton from "../../components/CustomButton";
@@ -39,38 +40,47 @@ const ProfileTab = () => {
         copyToCacheDirectory: true,
       });
 
-      if (res.type === "cancel") {
+      const customersCSV = res.assets?.[0];
+
+      if (res.canceled || !customersCSV) {
+        Alert.alert("Canceled from selecting file");
         console.log("cancelled");
         return null;
       }
 
-      console.log("Selected file name:", res.name);
-      console.log(`Selected file size: ${res.size} bytes`);
-      console.log(`Selected file uri: ${res.uri}`);
-      console.log(`Selected file mime type: ${res.mimeType}`);
+      console.log("Selected file name:", customersCSV.name);
+      console.log(`Selected file size: ${customersCSV.size} bytes`);
+      console.log(`Selected file uri: ${customersCSV.uri}`);
+      console.log(`Selected file mime type: ${customersCSV.mimeType}`);
 
-      const file = await fetch(res.uri);
-      const fileData = readString(await file.text(), { header: true });
+      const fileData = await FileSystem.readAsStringAsync(customersCSV.uri);
+      const parsedData = readString(fileData, { header: true });
 
-      console.log(fileData.data);
+      if (!parsedData.data || !parsedData.data.length) {
+        console.log("Invalid file format");
+        return;
+      }
 
-      //create new clients from fileData
+      console.log(parsedData.data);
 
       const id = await getUserId();
 
-      fileData.data.forEach(async (client: any) => {
-        const res = await createNewClient(
+      const promises = parsedData.data.map(async (client: any) => {
+        const result = await createNewClient(
           id ?? "NO ID FOUND",
           client.Customer,
           parseInt(client.HouseNumber),
           client.Street,
           client.City
         );
-        console.log(res);
+        console.log(result);
+        return result;
       });
 
-      //send new clients to backend
+      const results = await Promise.all(promises);
+      console.log(results);
     } catch (err) {
+      Alert.alert("Error", "Failed to import clients. Please try again.");
       console.log(err);
     }
   };

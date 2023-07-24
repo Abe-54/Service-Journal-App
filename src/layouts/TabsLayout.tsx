@@ -1,8 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { Button, Platform, Pressable, StyleSheet, Text } from "react-native";
 import { getUser } from "../api";
+import Colors from "../constants/Colors";
 import useUserStore from "../stores/UserStore";
 
 const TabsLayout = () => {
@@ -45,17 +46,33 @@ const TabsLayout = () => {
           headerStyle: styles.headerStyle,
         }}
       />
+
       <Tabs.Screen
         name="newEntryTab"
         options={{
-          title: "New Entry",
+          tabBarButton: (props) => {
+            const children =
+              Platform.OS === "web" ? (
+                props.children
+              ) : (
+                <Pressable>{props.children}</Pressable>
+              );
+
+            return (
+              <Link
+                href="/chooseClient"
+                style={[{ display: "flex" }, props.style]}
+                asChild={Platform.OS !== "web"}
+                children={children}
+              />
+            );
+          },
           tabBarIcon: ({ focused, color }) => (
             <MaterialCommunityIcons name="plus" size={24} color={color} />
           ),
-          headerTitleAlign: "center",
-          headerStyle: styles.headerStyle,
         }}
       />
+
       <Tabs.Screen
         name="profileTab"
         options={{

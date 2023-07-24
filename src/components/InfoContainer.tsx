@@ -8,12 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
 import Colors from "../constants/Colors";
-import {
-  default as DropdownComponent,
-  default as DropdownPickerComponent,
-} from "./Input Components/DropdownComponent";
+import DropdownPickerComponent from "./Input Components/OldDropdownComponent";
 import TextInputComponent from "./Input Components/TextInputComponent";
 
 interface InfoContainerProps {

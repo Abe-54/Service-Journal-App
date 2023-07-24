@@ -36,7 +36,6 @@ const initialJournalEntry: JournalEntryItem[] = [
 ];
 
 const JournalEntryScreen = () => {
-  const queryClient = useQueryClient();
   const { journalEntry_id, client_id } = useLocalSearchParams<{
     journalEntry_id: string;
     client_id?: string;

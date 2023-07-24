@@ -1,1 +1,1 @@
-export { default } from "../../src/screens/Tabs/NewEntryTab";
+export { default } from "../../src/screens/Tabs/ProfileTab";
