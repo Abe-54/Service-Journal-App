@@ -1,14 +1,101 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import ClientButton from "../../components/ClientButton";
+import ClientList from "../../components/ClientList";
+import CustomButton from "../../components/CustomButton";
+import Searchbar from "../../components/Input Components/Searchbar";
+import Colors from "../../constants/Colors";
+import { Client } from "../../interfaces/Client";
 
 const ChooseClient = () => {
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [clicked, setClicked] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+
+  const itemToRender = (item: Client) => {
+    const isSelected = selectedClient === item;
+
+    if (
+      searchPhrase === "" ||
+      item.client_name.toLowerCase().includes(searchPhrase.toLowerCase())
+    ) {
+      return (
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <ClientButton
+            client={item}
+            onPress={() => {
+              setSelectedClient(isSelected ? null : item);
+              console.log(selectedClient?.client_name);
+            }}
+            variant={isSelected ? "disabled" : "light_blue"}
+          />
+          {isSelected && (
+            <Entypo
+              name="cross"
+              size={26}
+              color="tomato"
+              style={{ padding: 10, marginRight: 10 }}
+              onPress={() => {
+                setSearchPhrase("");
+                setSelectedClient(null);
+              }}
+            />
+          )}
+        </View>
+      );
+    }
+  };
 
   return (
-    <View>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <Searchbar
+        searchPhrase={searchPhrase}
+        setSearchPhrase={setSearchPhrase}
+        clicked={clicked}
+        setClicked={setClicked}
+        OnCanceled={() => {}}
+      />
+      <ClientList
+        renderItem={(client) => {
+          return itemToRender(client) ?? <></>;
+        }}
+      />
+      <KeyboardAvoidingView>
+        <CustomButton
+          variant="light_blue"
+          style={{ margin: 20, padding: 15, borderRadius: 100 }}
+        >
+          <Text
+            style={{ textAlign: "center", fontSize: 24, fontWeight: "600" }}
+          >
+            Next
+          </Text>
+        </CustomButton>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 export default ChooseClient;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: Colors.dark_green[500],
+    display: "flex",
+    flexGrow: 1,
+  },
+});

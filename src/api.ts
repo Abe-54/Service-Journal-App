@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@env";
 import axios from "axios";
 import { UserCredential } from "firebase/auth";
+import useAuthStore from "./stores/AuthStore";
 import useUserStore from "./stores/UserStore";
 
 const serviceJournalURL = axios.create({
@@ -9,7 +10,7 @@ const serviceJournalURL = axios.create({
 
 serviceJournalURL.interceptors.request.use(
   async (config) => {
-    const userCredentials = await useUserStore.getState().userCredentials();
+    const userCredentials = await useAuthStore.getState().user?.getIdToken();
     if (userCredentials) {
       config.headers.Authorization = `Bearer ${userCredentials}`;
     }
@@ -73,7 +74,7 @@ export const getUser = async (userId: string) => {
 
 export const getClients = async (id: string) => {
   const res = await serviceJournalURL.get(`${id}/clients/`);
-  console.log(res.data);
+  // console.log(res.data);
   return res.data;
 };
 

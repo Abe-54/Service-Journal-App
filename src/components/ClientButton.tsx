@@ -8,20 +8,26 @@ import CustomButton from "./CustomButton";
 
 interface ClientButtonProps {
   client: Client;
+  variant?: "light_blue" | "disabled";
   onPress: () => void;
 }
 
-const ClientButton = ({ client, onPress }: ClientButtonProps) => {
+const ClientButton = ({
+  client,
+  onPress,
+  variant = "light_blue",
+}: ClientButtonProps) => {
   return (
     <CustomButton
-      variant="light_blue"
+      variant={variant}
       style={{
         display: "flex",
         flexDirection: "row",
         flexGrow: 1,
         alignItems: "center",
         padding: 20,
-        margin: 16,
+        marginHorizontal: 8,
+        marginVertical: 16,
         borderRadius: 5,
       }}
       android_disableSound={false}

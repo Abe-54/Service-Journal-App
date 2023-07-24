@@ -42,15 +42,7 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
 
       console.log("firebaseUserId: ", firebaseUserId);
 
-      if (Platform.OS === "web") {
-        console.log("web");
-        localStorage.setItem("firebaseUserId", firebaseUserId);
-        localStorage.setItem("idToken", idToken);
-      } else {
-        console.log("mobile");
-        await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
-        await SecureStore.setItemAsync("idToken", idToken);
-      }
+      set({ user: response.user, isLoggedIn: true });
 
       console.log(response);
 
@@ -75,13 +67,7 @@ const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
 
       console.log("firebaseUserId: ", firebaseUserId);
 
-      if (Platform.OS === "web") {
-        localStorage.setItem("firebaseUserId", firebaseUserId);
-        localStorage.setItem("idToken", idToken);
-      } else {
-        await SecureStore.setItemAsync("firebaseUserId", firebaseUserId);
-        await SecureStore.setItemAsync("idToken", idToken);
-      }
+      set({ user: userCredential.user, isLoggedIn: true });
 
       createNewUser(firebaseUserId, "Name", "Company Name");
 

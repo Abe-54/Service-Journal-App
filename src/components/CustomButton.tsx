@@ -5,7 +5,7 @@ import Colors from "../constants/Colors";
 interface CustomButtonProps extends PressableProps {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
-  variant?: "primary" | "secondary" | "light_blue";
+  variant?: "primary" | "secondary" | "light_blue" | "disabled";
   customColors?: {
     defaultColor: string;
     pressedColor: string;
@@ -28,6 +28,11 @@ const getColorsForVariant = (variant: string) => {
       return {
         defaultColor: Colors.royal_blue[300],
         pressedColor: Colors.royal_blue[400],
+      };
+    case "disabled":
+      return {
+        defaultColor: Colors.gray[500],
+        pressedColor: Colors.gray[500],
       };
     default: {
       return {
