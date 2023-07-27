@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  SafeAreaView,
   StyleSheet,
   Text,
   View,
@@ -16,9 +17,10 @@ import ClientButton from "./ClientButton";
 
 interface ClientListProps {
   renderItem: (client: Client) => JSX.Element;
+  listHeader?: JSX.Element;
 }
 
-const ClientList = ({ renderItem }: ClientListProps) => {
+const ClientList = ({ renderItem, listHeader }: ClientListProps) => {
   const { getUserId } = useUserStore((state) => ({
     getUserId: state.userId,
   }));
@@ -54,7 +56,13 @@ const ClientList = ({ renderItem }: ClientListProps) => {
 
   if (!isLoading && data) {
     screenContent = (
-      <FlatList data={data} renderItem={({ item }) => renderItem(item)} />
+      <FlatList
+        data={data}
+        renderItem={({ item }) => renderItem(item)}
+        ListHeaderComponent={listHeader}
+        stickyHeaderIndices={[0]}
+        // keyExtractor={(item) => item.client_id.toString()}
+      />
     );
   } else if (!isLoading && error.message.includes("401")) {
     screenContent = (
@@ -82,17 +90,17 @@ const ClientList = ({ renderItem }: ClientListProps) => {
   }
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         justifyContent: "center",
         backgroundColor: Colors.dark_green[400],
-        margin: 5,
+        // margin: 5,
         borderRadius: 10,
       }}
     >
       {screenContent}
-    </View>
+    </SafeAreaView>
   );
 };
 

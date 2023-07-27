@@ -1,4 +1,4 @@
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -14,6 +14,7 @@ import CustomButton from "../../components/CustomButton";
 import Searchbar from "../../components/Input Components/Searchbar";
 import Colors from "../../constants/Colors";
 import { Client } from "../../interfaces/Client";
+import { router } from "expo-router";
 
 const ChooseClient = () => {
   const [searchPhrase, setSearchPhrase] = useState("");
@@ -62,19 +63,38 @@ const ChooseClient = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Searchbar
-        searchPhrase={searchPhrase}
-        setSearchPhrase={setSearchPhrase}
-        clicked={clicked}
-        setClicked={setClicked}
-        OnCanceled={() => {}}
-      />
       <ClientList
         renderItem={(client) => {
           return itemToRender(client) ?? <></>;
         }}
+        listHeader={
+          <SafeAreaView
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              backgroundColor: Colors.royal_blue[300],
+              padding: 15,
+              paddingBottom: 0,
+              alignItems: "center",
+            }}
+          >
+            <Ionicons
+              name="arrow-back-outline"
+              size={24}
+              color="black"
+              onPress={() => router.back()}
+            />
+            <Searchbar
+              searchPhrase={searchPhrase}
+              setSearchPhrase={setSearchPhrase}
+              clicked={clicked}
+              setClicked={setClicked}
+              OnCanceled={() => {}}
+            />
+          </SafeAreaView>
+        }
       />
-      <KeyboardAvoidingView>
+      <View>
         <CustomButton
           variant="light_blue"
           style={{ margin: 20, padding: 15, borderRadius: 100 }}
@@ -85,7 +105,7 @@ const ChooseClient = () => {
             Next
           </Text>
         </CustomButton>
-      </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -95,7 +115,6 @@ export default ChooseClient;
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: Colors.dark_green[500],
-    display: "flex",
-    flexGrow: 1,
+    height: "100%",
   },
 });

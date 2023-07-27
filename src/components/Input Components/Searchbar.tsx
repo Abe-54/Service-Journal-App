@@ -4,6 +4,7 @@ import {
   Button,
   Keyboard,
   Pressable,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,9 +15,10 @@ import Colors from "../../constants/Colors";
 interface SearchbarProps {
   clicked: boolean;
   searchPhrase: string;
-  setSearchPhrase: React.Dispatch<React.SetStateAction<string>>;
+  setSearchPhrase: (phrase: string) => void;
   setClicked: React.Dispatch<React.SetStateAction<boolean>>;
   OnCanceled?: () => void;
+  searchPlaceholder?: string;
 }
 
 const Searchbar = ({
@@ -25,6 +27,7 @@ const Searchbar = ({
   setSearchPhrase,
   setClicked,
   OnCanceled,
+  searchPlaceholder,
 }: SearchbarProps) => {
   return (
     <View style={styles.container}>
@@ -37,25 +40,29 @@ const Searchbar = ({
           name="search"
           size={24}
           color="black"
-          style={{ marginLeft: 1 }}
+          style={clicked ? { marginHorizontal: 15 } : { margin: 0 }}
         />
         <TextInput
           style={styles.input}
-          placeholder="Search"
+          placeholder={searchPlaceholder ? searchPlaceholder : "Search"}
           onChangeText={(text) => setSearchPhrase(text)}
           value={searchPhrase}
           onFocus={() => setClicked(true)}
         />
-        {clicked && (
-          <Entypo
-            name="cross"
-            size={20}
-            color="black"
-            style={{ padding: 1 }}
-            onPress={() => {
-              setSearchPhrase("");
-            }}
-          />
+        {clicked && searchPhrase.length > 0 && (
+          <View
+            style={{ marginRight: 15 }}
+            hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
+          >
+            <Entypo
+              name="cross"
+              size={20}
+              color="black"
+              onPress={() => {
+                setSearchPhrase("");
+              }}
+            />
+          </View>
         )}
       </View>
       {clicked && (
@@ -84,11 +91,12 @@ export default Searchbar;
 
 const styles = StyleSheet.create({
   container: {
-    margin: 15,
+    // margin: 15,
+    padding: 15,
     justifyContent: "flex-start",
     alignItems: "center",
     flexDirection: "row",
-    width: "95%",
+    width: "100%",
   },
   searchBar__unclicked: {
     padding: 10,
@@ -101,7 +109,7 @@ const styles = StyleSheet.create({
   searchBar__clicked: {
     padding: 10,
     flexDirection: "row",
-    width: "80%",
+    width: "75%",
     backgroundColor: "#d9dbda",
     borderRadius: 15,
     alignItems: "center",
