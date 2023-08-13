@@ -1,7 +1,7 @@
 import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import Colors from "../../../constants/Colors";
-import { JournalEntry } from "../../../interfaces/JournalEntry";
+import { JournalEntry } from "../../../types/JournalEntry";
 import EntryListHeader from "./EntryListHeader";
 import EntryListItem from "./EntryListItem";
 

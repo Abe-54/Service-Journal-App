@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import Colors from "../constants/Colors";
-import { Client } from "../interfaces/Client";
+import { Client } from "../types/Client";
 import normalizeName from "../util/NormalizeName";
 import CustomButton from "./CustomButton";
 
@@ -41,7 +41,8 @@ const ClientButton = ({
           fontWeight: "700",
         }}
       >
-        {normalizeName(client)}
+        {client ? normalizeName(client) : "No client selected"}
+        {/* {client.client_name} */}
       </Text>
     </CustomButton>
   );

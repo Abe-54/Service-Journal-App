@@ -3,19 +3,20 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { Client } from "../../src/interfaces/Client";
 import { deleteClient, getClientJournal, getSingleClient } from "../api";
 import InfoContainer from "../components/InfoContainer";
 import JournalView from "../components/Journal View/JournalView";
 import Colors from "../constants/Colors";
-import { JournalEntry } from "../interfaces/JournalEntry";
+import useAuthStore from "../stores/AuthStore";
 import useUserStore from "../stores/UserStore";
+import { Client } from "../types/Client";
+import { JournalEntry } from "../types/JournalEntry";
 import normalizeName from "../util/NormalizeName";
 
 const ClientScreen = () => {
-  const { client_id } = useLocalSearchParams();
-  const { getUserId } = useUserStore((state) => ({
-    getUserId: state.userId,
+  const { client_id } = useLocalSearchParams<{ client_id: string }>();
+  const { user } = useAuthStore((state) => ({
+    user: state.user,
   }));
   const router = useRouter();
 
@@ -27,8 +28,9 @@ const ClientScreen = () => {
   } = useQuery<Client, Error>(
     ["client", { client_id: String(client_id) }],
     async () => {
-      const id = (await getUserId()) ?? "NO ID FOUND";
+      const id = user?.uid ?? "NO ID FOUND";
       const client = await getSingleClient(id, String(client_id));
+      console.log("CLIENT DATA: ", client);
       return client;
     }
   );
@@ -41,7 +43,7 @@ const ClientScreen = () => {
   } = useQuery<JournalEntry[], Error>(
     ["journal", { client_id: String(client_id) }],
     async () => {
-      const id = (await getUserId()) ?? "NO ID FOUND";
+      const id = user?.uid ?? "NO ID FOUND";
       const journal = await getClientJournal(
         id ?? "NO ID FOUND",
         String(client_id)
@@ -55,12 +57,12 @@ const ClientScreen = () => {
     { title: "Street", value: clientData?.street ?? "No Street" },
     {
       title: "House",
-      value: clientData?.house_number.toString() ?? "No House Number",
+      value: "No House Number",
     },
   ];
 
   const handleDeleteClient = async (id: number) => {
-    const userId = await getUserId();
+    const userId = user?.uid;
     if (userId) {
       await deleteClient(userId, id);
       router.replace("/");

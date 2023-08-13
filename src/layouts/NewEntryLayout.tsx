@@ -1,16 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import Colors from "../constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import Searchbar from "../components/Input Components/Searchbar";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Searchbar from "../components/Input Components/Searchbar";
+import Colors from "../constants/Colors";
 
 const NewEntryLayout = () => {
-  const params = useLocalSearchParams<{ q?: string }>();
-  const [search, setSearch] = useState(params.q);
-  const [clicked, setClicked] = useState(false);
-
   return (
     <Stack
       screenOptions={{
@@ -24,42 +20,13 @@ const NewEntryLayout = () => {
         options={{
           title: "Choose Client",
           header: () => <></>,
-
-          // header: () => (
-          //   <SafeAreaView
-          //     style={{
-          //       display: "flex",
-          //       flexDirection: "row",
-          //       backgroundColor: Colors.royal_blue[400],
-          //       paddingHorizontal: 10,
-          //       alignItems: "center",
-          //     }}
-          //   >
-          //     <Ionicons
-          //       name="arrow-back-outline"
-          //       size={24}
-          //       color="black"
-          //       onPress={() => router.back()}
-          //     />
-          //     {/* <Searchbar
-          //       searchPlaceholder="Choose Client..."
-          //       searchPhrase={search ?? ""}
-          //       setSearchPhrase={(search) => {
-          //         setSearch;
-          //         router.setParams({ q: search });
-          //       }}
-          //       clicked={clicked}
-          //       setClicked={() => setClicked}
-          //       OnCanceled={() => {}}
-          //     /> */}
-          //   </SafeAreaView>
-          // ),
         }}
       />
       <Stack.Screen
         name="chooseService"
         options={{
           title: "Choose Service",
+          header: () => <></>,
         }}
       />
       <Stack.Screen

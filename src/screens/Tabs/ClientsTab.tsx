@@ -3,14 +3,16 @@ import React from "react";
 import { SafeAreaView } from "react-native";
 import { getClients } from "../../api";
 import ClientButton from "../../components/ClientButton";
-import ClientList from "../../components/ClientList";
+import DataList from "../../components/DataList";
 import Colors from "../../constants/Colors";
+import { Client } from "../../types/Client";
 
 const clientsTab = () => {
   const router = useRouter();
 
   const handleClientPress = (clientId: string) => {
     router.push(`/clients/${clientId}`);
+    console.log("Client pressed: " + clientId);
   };
 
   return (
@@ -22,7 +24,8 @@ const clientsTab = () => {
         justifyContent: "flex-start",
       }}
     >
-      <ClientList
+      <DataList<Client>
+        dataFetcher={(userId) => getClients(userId ?? "")}
         renderItem={(client) => (
           <ClientButton
             client={client}

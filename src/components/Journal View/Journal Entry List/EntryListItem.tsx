@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Colors from "../../../constants/Colors";
-import { JournalEntry } from "../../../interfaces/JournalEntry";
+import { JournalEntry } from "../../../types/JournalEntry";
 import CustomButton from "../../CustomButton";
 
 interface EntryListItemProps {

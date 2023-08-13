@@ -5,8 +5,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import { getAllServices, getClients, getUser } from "../../api";
 import DropdownComponent from "../../components/Input Components/DropdownComponent";
 import Colors from "../../constants/Colors";
-import { Client } from "../../interfaces/Client";
 import useUserStore from "../../stores/UserStore";
+import { Client } from "../../types/Client";
 import normalizeName from "../../util/NormalizeName";
 
 const statusOptions = [

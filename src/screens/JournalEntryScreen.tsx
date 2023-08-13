@@ -8,8 +8,8 @@ import { MarkedDates } from "react-native-calendars/src/types";
 import { getAllServices, getJournalEntry, updateJournalEntry } from "../api";
 import InfoContainer from "../components/InfoContainer";
 import Colors from "../constants/Colors";
-import { JournalEntry } from "../interfaces/JournalEntry";
-import { Service } from "../interfaces/Service";
+import { JournalEntry } from "../types/JournalEntry";
+import { Service } from "../types/Service";
 
 interface JournalEntryItem {
   title: string;
