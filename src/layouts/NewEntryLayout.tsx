@@ -35,6 +35,12 @@ const NewEntryLayout = () => {
           title: "Enter Details",
         }}
       />
+      <Stack.Screen
+        name="confirmEntry"
+        options={{
+          title: "Confirm Details",
+        }}
+      />
     </Stack>
   );
 };

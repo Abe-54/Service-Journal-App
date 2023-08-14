@@ -13,15 +13,13 @@ import useNewEntryStore from "../../stores/NewEntryStore";
 import { Service } from "../../types/Service";
 
 const ChooseService = () => {
-  const { client } = useLocalSearchParams<{ client: string }>();
-
   const [searchPhrase, setSearchPhrase] = useState("");
   const [clicked, setClicked] = useState(false);
   const { selectedServiceId, setSelectedServiceId } = useNewEntryStore();
 
-  // useEffect(() => {
-  //   console.log(selectedService?.service_name);
-  // }, [selectedService]);
+  useEffect(() => {
+    console.log(selectedServiceId);
+  }, []);
 
   const itemToRender = (item: Service) => {
     const isSelected = selectedServiceId === item.service_id;
@@ -132,7 +130,6 @@ const ChooseService = () => {
           <Link
             href={{
               pathname: "/enterDetails",
-              params: { client: client, service: selectedServiceId },
             }}
             asChild
           >

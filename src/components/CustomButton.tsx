@@ -31,8 +31,8 @@ const getColorsForVariant = (variant: string) => {
       };
     case "disabled":
       return {
-        defaultColor: Colors.gray[500],
-        pressedColor: Colors.gray[500],
+        pressedColor: Colors.royal_blue[600],
+        defaultColor: Colors.royal_blue[600],
       };
     default: {
       return {

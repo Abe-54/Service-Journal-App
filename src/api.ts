@@ -11,7 +11,7 @@ const serviceJournalURL = axios.create({
 serviceJournalURL.interceptors.request.use(
   async (config) => {
     const userCredentials = await useAuthStore.getState().user?.getIdToken();
-    console.info("INTERCEPTOR, userCredentials: ", userCredentials);
+    // console.info("INTERCEPTOR, userCredentials: ", userCredentials);
     if (userCredentials) {
       config.headers.Authorization = `Bearer ${userCredentials}`;
     }
@@ -89,6 +89,27 @@ export const getClientJournal = async (userId: string, clientId: string) => {
   const res = await serviceJournalURL.get(
     `${userId}/journal/client=${clientId}`
   );
+  console.log(res.data);
+  return res.data;
+};
+
+export const createJournalEntry = async (
+  userId: string,
+  clientId: number,
+  status: string,
+  description: string,
+  service_id: number,
+  price: number,
+  service_date: Date
+) => {
+  const res = await serviceJournalURL.post(`${userId}/journal/new_entry`, {
+    client_id: clientId,
+    status: status,
+    description: description,
+    service_id: service_id,
+    price: price,
+    service_date: service_date,
+  });
   console.log(res.data);
   return res.data;
 };

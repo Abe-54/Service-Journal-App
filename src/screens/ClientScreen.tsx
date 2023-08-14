@@ -1,6 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Stack,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { deleteClient, getClientJournal, getSingleClient } from "../api";
@@ -19,6 +24,14 @@ const ClientScreen = () => {
     user: state.user,
   }));
   const router = useRouter();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      e.preventDefault();
+      if (e.defaultPrevented) router.push("/clientsTab");
+    });
+  }, []);
 
   const {
     isLoading: isClientLoading,
@@ -57,7 +70,7 @@ const ClientScreen = () => {
     { title: "Street", value: clientData?.street ?? "No Street" },
     {
       title: "House",
-      value: "No House Number",
+      value: clientData?.house_number.toString() ?? "No House Number",
     },
   ];
 
