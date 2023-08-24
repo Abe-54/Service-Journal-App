@@ -18,15 +18,23 @@ import useAuthStore from "../../stores/AuthStore";
 const SignInScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, signup, toggleSignUpMode, signUpMode, user, isLoading } =
-    useAuthStore((state) => ({
-      login: state.signin,
-      signup: state.signup,
-      toggleSignUpMode: state.toggleSignUpMode,
-      signUpMode: state.signUpMode,
-      user: state.user,
-      isLoading: state.isLoading,
-    }));
+  const {
+    login,
+    signup,
+    toggleSignUpMode,
+    signUpMode,
+    user,
+    isLoading,
+    setGuestMode,
+  } = useAuthStore((state) => ({
+    login: state.signin,
+    signup: state.signup,
+    toggleSignUpMode: state.toggleSignUpMode,
+    signUpMode: state.signUpMode,
+    setGuestMode: state.setGuestMode,
+    user: state.user,
+    isLoading: state.isLoading,
+  }));
   const router = useRouter();
 
   const handleSignIn = async () => {
@@ -41,6 +49,18 @@ const SignInScreen = () => {
     toggleSignUpMode();
     if (user && signedUp) {
       router.replace("/(tabs)/clientsTab");
+    }
+  };
+
+  const handleGuestSignIn = async () => {
+    const guestEmail = "sample@mail.com";
+    const guestPassword = "guest123";
+    const guestLoggedIn = await login(guestEmail, guestPassword);
+    setGuestMode(true);
+    console.log("signing guess in");
+    if (guestLoggedIn) {
+      router.replace("/(tabs)/clientsTab");
+      console.log("guestLoggedIn", guestLoggedIn);
     }
   };
 
@@ -63,29 +83,16 @@ const SignInScreen = () => {
       </View>
       <View style={styles.container}>
         <View style={styles.inputContainer}>
-          <View style={styles.socialMediaButtonsContainer}>
+          <View style={styles.guestButtonContainer}>
             <CustomButton
-              style={styles.socialMediaButton}
-              onPress={() => {}}
+              style={styles.guestButton}
+              onPress={handleGuestSignIn}
               customColors={{
                 defaultColor: "#4285F4",
                 pressedColor: "#3b78dc",
               }}
             >
-              <View
-                style={{
-                  backgroundColor: "white",
-                  borderRadius: 100,
-                  padding: 4,
-                  margin: 4,
-                }}
-              >
-                <GoogleIcon width={20} height={20} />
-              </View>
-
-              <Text style={styles.socialMediaButtonText}>
-                Continue with Google
-              </Text>
+              <Text style={styles.guestButtonText}>Continue As Guest</Text>
             </CustomButton>
           </View>
           <View style={styles.dividerContainer}>
@@ -228,25 +235,25 @@ const styles = StyleSheet.create({
     color: "darkgray",
     fontWeight: "700",
   },
-  socialMediaButtonsContainer: {
+  guestButtonContainer: {
     flexDirection: "row",
     justifyContent: "center",
     marginVertical: 10,
   },
-  socialMediaButton: {
+  guestButton: {
     display: "flex",
     flexDirection: "row",
     flexGrow: 1,
-    padding: 5,
+    padding: 12,
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 10,
     elevation: 5,
   },
-  socialMediaButtonText: {
+  guestButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "600",
     marginLeft: 10,
   },

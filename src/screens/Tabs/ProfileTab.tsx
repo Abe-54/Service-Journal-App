@@ -8,27 +8,33 @@ import { createNewClient, getUser } from "../../api";
 import CustomButton from "../../components/CustomButton";
 import Colors from "../../constants/Colors";
 import useAuthStore from "../../stores/AuthStore";
-import useUserStore from "../../stores/UserStore";
+
+type CustomUser = {
+  company_name: string;
+  user_name: string;
+};
 
 const ProfileTab = () => {
-  const [user, setUser] = useState({ company_name: "" });
-  const { getUserId } = useUserStore((state) => ({
-    getUserId: state.userId,
+  const [userData, setUserData] = useState<CustomUser | null>(null);
+  const { user, signOut, guestMode, setGuestMode } = useAuthStore((state) => ({
+    signOut: state.signout,
+    guestMode: state.guestMode,
+    setGuestMode: state.setGuestMode,
+    user: state.user,
   }));
-  const { signOut } = useAuthStore((state) => ({ signOut: state.signout }));
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const id = await getUserId();
-      const user = await getUser(id ?? "NO ID FOUND");
-      setUser(user);
+    const fetchUserData = async () => {
+      const fetchedData = await getUser(user?.uid ?? "NO ID FOUND");
+      setUserData(fetchedData);
     };
-    fetchUser();
+    fetchUserData();
   }, []);
 
   const handleLogOut = async () => {
     await signOut();
+    setGuestMode(false);
     router.replace("/sign-in");
     console.log("LOGGED OUT");
   };
@@ -63,7 +69,7 @@ const ProfileTab = () => {
 
       console.log(parsedData.data);
 
-      const id = await getUserId();
+      const id = user?.uid;
 
       const promises = parsedData.data.map(async (client: any) => {
         const result = await createNewClient(
@@ -89,18 +95,22 @@ const ProfileTab = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.profileInfo}>
         <Text style={styles.profileText}>
-          Company: {user ? user.company_name : ""}
+          {userData ? userData.company_name : "no company name found"}
         </Text>
         <View style={styles.buttonsView}>
           <CustomButton style={[styles.profileButton]} onPress={handleLogOut}>
             <Text style={styles.profileLogOutText}>Log Out</Text>
           </CustomButton>
-          <CustomButton
-            style={[styles.profileButton]}
-            onPress={handleImportClients}
-          >
-            <Text style={styles.profileLogOutText}>Import Clients</Text>
-          </CustomButton>
+          {!guestMode ? (
+            <CustomButton
+              style={[styles.profileButton]}
+              onPress={handleImportClients}
+            >
+              <Text style={styles.profileLogOutText}>Import Clients</Text>
+            </CustomButton>
+          ) : (
+            <></>
+          )}
         </View>
       </View>
     </SafeAreaView>

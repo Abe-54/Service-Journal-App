@@ -8,6 +8,7 @@ import { MarkedDates } from "react-native-calendars/src/types";
 import { getAllServices, getJournalEntry, updateJournalEntry } from "../api";
 import InfoContainer from "../components/InfoContainer";
 import Colors from "../constants/Colors";
+import useAuthStore from "../stores/AuthStore";
 import { JournalEntry } from "../types/JournalEntry";
 import { Service } from "../types/Service";
 
@@ -45,6 +46,7 @@ const JournalEntryScreen = () => {
   const [tempJournalData, seTempJournalData] = useState<JournalEntryItem[]>([
     ...initialJournalEntry,
   ]);
+  const { user } = useAuthStore();
 
   const {
     isLoading: isEntryLoading,
@@ -60,7 +62,11 @@ const JournalEntryScreen = () => {
       },
     ],
     async () =>
-      await getJournalEntry("1", String(client_id), String(journalEntry_id))
+      await getJournalEntry(
+        user?.uid ?? "NO ID FOUND",
+        String(client_id),
+        String(journalEntry_id)
+      )
   );
 
   const {

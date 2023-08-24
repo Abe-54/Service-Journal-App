@@ -15,6 +15,7 @@ const auth = FIREBASE_AUTH;
 
 type AuthStoreState = {
   user: User | null;
+  guestMode: boolean;
   isLoggedIn: boolean;
   isLoading: boolean;
   signUpMode: boolean;
@@ -25,14 +26,17 @@ type AuthStoreActions = {
   signup: (email: string, password: string) => Promise<boolean>;
   signout: () => Promise<void>;
   toggleSignUpMode: () => void;
+  setGuestMode: (mode: boolean) => void;
 };
 
 const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => ({
   user: null,
+  guestMode: false,
   isLoggedIn: false,
   isLoading: false,
   signUpMode: true,
   toggleSignUpMode: () => set((state) => ({ signUpMode: !state.signUpMode })),
+  setGuestMode: (mode: boolean) => set({ guestMode: mode }),
   signin: async (email: string, password: string) => {
     try {
       set({ isLoading: true });

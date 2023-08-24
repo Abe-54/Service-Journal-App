@@ -65,7 +65,7 @@ const DataList = <T extends unknown>({
         data={data}
         renderItem={({ item }) => renderItem(item)}
         ListHeaderComponent={listHeader}
-        stickyHeaderIndices={[0]}
+        stickyHeaderIndices={listHeader ? [0] : undefined}
         keyExtractor={keyExtractor}
       />
     );

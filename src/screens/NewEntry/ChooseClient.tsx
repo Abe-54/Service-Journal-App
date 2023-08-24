@@ -139,7 +139,7 @@ const ChooseClient = () => {
         <></>
       )}
 
-      <StageIndicator currentStage={3} totalStages={4} />
+      <StageIndicator currentStage={1} totalStages={4} />
     </SafeAreaView>
   );
 };
