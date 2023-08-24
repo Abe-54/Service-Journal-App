@@ -4,19 +4,17 @@ import React, { useEffect, useState } from "react";
 import { Button, Platform, Pressable, StyleSheet, Text } from "react-native";
 import { getUser } from "../api";
 import Colors from "../constants/Colors";
+import useAuthStore from "../stores/AuthStore";
 import useUserStore from "../stores/UserStore";
 
 const TabsLayout = () => {
   const [userName, setUserName] = useState("");
-  const { getUserId } = useUserStore((state) => ({
-    getUserId: state.userId,
-  }));
+  const { user } = useAuthStore((state) => ({ user: state.user }));
 
   useEffect(() => {
     const getUserName = async () => {
-      const id = await getUserId();
-      const user = await getUser(id ?? "NO ID FOUND");
-      setUserName(user.user_name);
+      const userData = await getUser(user?.uid ?? "NO ID FOUND");
+      setUserName(userData?.user_name ?? "NO NAME FOUND");
     };
     getUserName();
   }, []);
