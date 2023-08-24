@@ -1,16 +1,25 @@
 // Import the functions you need from the SDKs you need
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_APP_ID,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_MEASUREMENT_ID,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+} from "@env";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCc7HjFSQZO78v2xKa6t-39KU68_RvIFaU",
-  authDomain: "service-journal-47b38.firebaseapp.com",
-  projectId: "service-journal-47b38",
-  storageBucket: "service-journal-47b38.appspot.com",
-  messagingSenderId: "97025793661",
-  appId: "1:97025793661:web:451ddfaba4deeea7861b14",
-  measurementId: "G-FCMTWB73LT",
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
+  measurementId: FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
