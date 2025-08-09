@@ -1,8 +1,8 @@
 ## Service Journal
-This is a prototype mobile app I designed to allow users to keep track of what services they accomplished for each of their clients when they accomplished them, and their status.
+This is a prototype mobile app I designed to allow users to track the services they have completed for each of their clients, along with their status.
 
 ## Motivation
-I decided to make this app because I wanted to assist my father's company and update his method of keeping track of what services he provided throughout a given month and to which clients.
+I decided to create this app because I wanted to help my father's company and update his method for tracking the services he provides throughout a given month and to which clients.
  
 ## Screenshots
 <p float="left">
@@ -19,9 +19,6 @@ I decided to make this app because I wanted to assist my father's company and up
 - How to collaborate closely with a client for design and features.
 - How to prioritize features aligned with business needs;
 
-## Where To View?
-The app can be viewed on my website at https://abraham-portfolio-site.vercel.app/
-
 ## Credits
 - Abraham Rubio (App developer)
 
@@ -29,7 +26,7 @@ The app can be viewed on my website at https://abraham-portfolio-site.vercel.app
 ## License
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
+In the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
